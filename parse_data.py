@@ -1,30 +1,33 @@
-from datetime import date
+from datetime import date, datetime
+from dateutil import tz
 import os
+import csv
 
-START_DATE = date(2020, 1, 15)
-END_DATE = date(2020, 1, 28)
+START_DATE = date(2021, 1, 15)
+END_DATE = date(2021, 2, 4)
 DATA_PATH = 'data/020521'
 
 all_data = {}
 
 for filename in os.listdir(DATA_PATH):
+  dataType = filename.strip().split('.')[0]
+
   f = open(DATA_PATH + '/' + filename, 'r')
-  lines = f.readlines()
-  header = lines[0]
-  data = lines[1:]
+  print ('BEGIN: ' + filename)
+  csvReader = csv.DictReader(f)
 
-  dateCol = 0
-  valueCol = 0
+  for row in csvReader:
+    dataDate = datetime.strptime(row['startDate'].strip(), "%Y-%m-%d %H:%M:%S %z").astimezone(tz.tzlocal()).date()
+    if dataDate < START_DATE or dataDate > END_DATE:
+      continue
+    dataVal = eval(row['value'].strip())
 
-  print (filename)
-  for i, heading in enumerate(header.strip().split(',')):
-    if heading == 'startDate':
-      dateCol = i
-    if heading == 'value':
-      valueCol = i
+    if dataDate not in all_data:
+      all_data[dataDate] = {}
+    if dataType not in all_data[dataDate]:
+      all_data[dataDate][dataType] = 0.0
+    all_data[dataDate][dataType] += dataVal
 
-  assert dateCol > 0, "No dateCol found in " + filename
-  assert valueCol > 0, "No valueCol found in " + filename
-  
+  print ('END: ' + filename)
   f.close()
   
