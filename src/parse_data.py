@@ -3,25 +3,13 @@ from xml.etree import ElementTree as ET
 
 import dataio
 import params as par
+from debug import xml_debug as xdb
 
-def show_node_summary(node):
-  print ("{}:\n\t{} attributes".format(node.tag, len(node.attrib)))
-  for a, v in node.attrib.items():
-    print ("\t\t{}:\t{}".format(a, v))
-  print ("\t{} children".format(len(node)))
-  for i, child in enumerate(node):
-    print ("\t\t{}:\t{}".format(i, child.tag))
-
-    if i >= 10:
-      print ("\t\t...")
-      break
-
-def process_xml(in_tree):
+def process_xml(in_tree, show_summary = False):
   start_time = datetime.now()
 
-  print()
-  print("ROOT SUMMARY")
-  show_node_summary(in_tree.getroot())
+  if show_summary:
+    xdb.XmlDebug.show_tree_summary(in_tree)
 
   processing_time = datetime.now() - start_time
   print()
@@ -51,7 +39,7 @@ def parse_data():
   print()
   print("Input parsed in {}".format(parse_time))
 
-  data_dict = process_xml(in_tree)
+  data_dict = process_xml(in_tree, show_summary = par.ParserParams.SHOW_SUMMARY)
   write_data(data_dict, out_csv)
 
   total_time = datetime.now() - start_time
