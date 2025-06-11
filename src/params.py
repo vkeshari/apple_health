@@ -1,0 +1,3 @@
+class ParserParams:
+  INPUT_FILENAME = '20250530.xml'
+  OUTPUT_FILENAME = '20250530.csv'
