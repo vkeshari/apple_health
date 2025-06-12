@@ -75,5 +75,7 @@ class DatetimeUtil:
 
   @classmethod
   def check_datetime_range(cls, dt, start_date, end_date):
-    dt_date = dt.date()
-    return dt_date >= start_date and dt_date < end_date
+    if not dt:
+      return False
+    
+    return dt.date() >= start_date and dt.date() < end_date

@@ -1,9 +1,7 @@
-import params as par
 from . import timeutil
 
 class XmlDebug:
   
-  _parse_timezone = par.ParserParams.PARSE_TIMEZONE
   _skip_dietary_data = True
   _show_orphaned_dates = False
 
@@ -22,7 +20,7 @@ class XmlDebug:
         break
   
   @classmethod
-  def show_tree_summary(cls, tree, start_date, end_date):
+  def show_tree_summary(cls, tree, start_date, end_date, parse_timezone):
     root = tree.getroot()
 
     print()
@@ -68,11 +66,9 @@ class XmlDebug:
         skip_record = True
       else:
         start_dt_parsed = \
-            timeutil.DatetimeUtil.parse_xml_datetime(child.attrib['startDate'],
-                                                        cls._parse_timezone)
+            timeutil.DatetimeUtil.parse_xml_datetime(child.attrib['startDate'], parse_timezone)
         end_dt_parsed = \
-            timeutil.DatetimeUtil.parse_xml_datetime(child.attrib['endDate'],
-                                                        cls._parse_timezone)
+            timeutil.DatetimeUtil.parse_xml_datetime(child.attrib['endDate'], parse_timezone)
 
         if not start_dt_parsed:
           record_metrics['orphan_start_date'] += 1
