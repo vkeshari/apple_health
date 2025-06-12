@@ -41,8 +41,8 @@ FIRST_DATE = TZ_HISTORY[0].start_date
 
 last_end_date = FIRST_DATE
 for tzh in TZ_HISTORY:
+  assert tzh.start_date >= last_end_date
   assert tzh.end_date > tzh.start_date
-  assert tzh.end_date > last_end_date
   last_end_date = tzh.end_date
 print("VALIDATED TZ_HISTORY")
 

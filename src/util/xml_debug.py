@@ -1,5 +1,5 @@
 import params as par
-from util import timeutil
+from . import timeutil
 
 class XmlDebug:
   

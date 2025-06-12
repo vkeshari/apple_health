@@ -3,7 +3,7 @@ from xml.etree import ElementTree as ET
 
 import dataio
 import params as par
-from debug import xml_debug as xdb
+from util import xml_debug as xdb
 
 def process_xml(in_tree, start_date, end_date, show_summary = False):
   start_time = datetime.now()
