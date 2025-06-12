@@ -1,9 +1,14 @@
+from datetime import datetime, date
+
+import params as par
 
 class XmlDebug:
   
+  _datetime_format = par.ParserParams.DATETIME_FORMAT
+  _skip_dietary_data = True
+
   @classmethod
   def show_node_summary(cls, node):
-    
     print("{}".format(node.tag))
     print("\t{} attribute(s)".format(len(node.attrib)))
     for a, v in node.attrib.items():
@@ -17,8 +22,7 @@ class XmlDebug:
         break
   
   @classmethod
-  def show_tree_summary(cls, tree):
-    
+  def show_tree_summary(cls, tree, start_date, end_date):
     root = tree.getroot()
 
     print()
@@ -29,6 +33,8 @@ class XmlDebug:
     record_metrics = {'total_records' : 0,
                       'missing_type' : 0,
                       'missing_start_date' : 0,
+                      'missing_end_date' : 0,
+                      'outside_date_range': 0,
                       'missing_unit' : 0,
                       'missing_value' : 0}
     missing_unit_record_types = set()
@@ -43,9 +49,6 @@ class XmlDebug:
       if 'type' not in child.attrib:
         record_metrics['missing_type'] += 1
         skip_record = True
-      if 'startDate' not in child.attrib:
-        record_metrics['missing_start_date'] += 1
-        skip_record = True
       if 'unit' not in child.attrib:
         record_metrics['missing_unit'] += 1
         missing_unit_record_types.add(child.attrib['type'])
@@ -54,11 +57,29 @@ class XmlDebug:
         record_metrics['missing_value'] += 1
         skip_record = True
       
+      if 'startDate' not in child.attrib:
+        record_metrics['missing_start_date'] += 1
+        skip_record = True
+      elif 'endDate' not in child.attrib:
+        record_metrics['missing_end_date'] += 1
+        skip_record = True
+      else:
+        start_date_parsed = datetime.strptime(child.attrib['startDate'],
+                                              cls._datetime_format) \
+                                .date()
+        end_date_parsed = datetime.strptime(child.attrib['endDate'],
+                                            cls._datetime_format) \
+                              .date()
+        if start_date_parsed < start_date or end_date_parsed >= end_date:
+          record_metrics['outside_date_range'] += 1
+          skip_record = True
+      
       if not skip_record:
         t = child.attrib['type']
-        if t.startswith('HKQuantityTypeIdentifierDietary'):
+        if cls._skip_dietary_data and t.startswith('HKQuantityTypeIdentifierDietary'):
           skipped_record_types.add(t)
           continue
+        
         u = child.attrib['unit']
         tu_tuple = tuple([t, u])
         if not tu_tuple in type_unit_counts:
@@ -75,9 +96,9 @@ class XmlDebug:
     
     print()
     print("RECORD TYPES")
-    for i, (t, u) in enumerate(sorted(type_unit_counts.keys())):
+    for i, tu in enumerate(sorted(type_unit_counts.keys())):
       print("{index:3d}\t{count:8d}\t{unit:>10}\t{type}" \
                 .format(index = i,
-                        count = type_unit_counts[tuple([t, u])],
-                        unit = u,
-                        type = t))
+                        count = type_unit_counts[tu],
+                        unit = tu[1],
+                        type = tu[0]))
