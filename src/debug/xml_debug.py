@@ -5,6 +5,7 @@ class XmlDebug:
   
   _parse_timezone = par.ParserParams.PARSE_TIMEZONE
   _skip_dietary_data = True
+  _show_orphaned_dates = False
 
   @classmethod
   def show_node_summary(cls, node):
@@ -29,6 +30,7 @@ class XmlDebug:
     cls.show_node_summary(root)
     
     type_unit_counts = {}
+    orphan_date_records = {}
     record_metrics = {'total_records' : 0,
                       'missing_type' : 0,
                       'missing_start_date' : 0,
@@ -74,9 +76,19 @@ class XmlDebug:
 
         if not start_dt_parsed:
           record_metrics['orphan_start_date'] += 1
+          t = child.attrib['type']
+          if t not in orphan_date_records:
+            orphan_date_records[t] = set()
+          date_string = child.attrib['startDate'][:10]
+          orphan_date_records[t].add(date_string)
           skip_record = True
         if not end_dt_parsed:
           record_metrics['orphan_end_date'] += 1
+          t = child.attrib['type']
+          if t not in orphan_date_records:
+            orphan_date_records[t] = set()
+          date_string = child.attrib['startDate'][:10]
+          orphan_date_records[t].add(date_string)
           skip_record = True
         
         if start_dt_parsed and end_dt_parsed:
@@ -107,6 +119,11 @@ class XmlDebug:
     print(missing_unit_record_types)
     print("SKIPPED RECORD TYPES: {}".format(len(skipped_record_types)))
     print(skipped_record_types)
+    print("ORPHAN DATE RECORDS")
+    for t in orphan_date_records:
+      print(t)
+      if cls._show_orphaned_dates:
+        print(sorted(orphan_date_records[t]))
     
     print()
     print("RECORD TYPES")
