@@ -1,10 +1,9 @@
-from datetime import datetime, date
-
 import params as par
+from util import timeutil
 
 class XmlDebug:
   
-  _datetime_format = par.ParserParams.DATETIME_FORMAT
+  _parse_timezone = par.ParserParams.PARSE_TIMEZONE
   _skip_dietary_data = True
 
   @classmethod
@@ -34,6 +33,8 @@ class XmlDebug:
                       'missing_type' : 0,
                       'missing_start_date' : 0,
                       'missing_end_date' : 0,
+                      'orphan_start_date': 0,
+                      'orphan_end_date': 0,
                       'outside_date_range': 0,
                       'missing_unit' : 0,
                       'missing_value' : 0}
@@ -64,15 +65,28 @@ class XmlDebug:
         record_metrics['missing_end_date'] += 1
         skip_record = True
       else:
-        start_date_parsed = datetime.strptime(child.attrib['startDate'],
-                                              cls._datetime_format) \
-                                .date()
-        end_date_parsed = datetime.strptime(child.attrib['endDate'],
-                                            cls._datetime_format) \
-                              .date()
-        if start_date_parsed < start_date or end_date_parsed >= end_date:
-          record_metrics['outside_date_range'] += 1
+        start_dt_parsed = \
+            timeutil.DatetimeUtil.parse_xml_datetime(child.attrib['startDate'],
+                                                        cls._parse_timezone)
+        end_dt_parsed = \
+            timeutil.DatetimeUtil.parse_xml_datetime(child.attrib['endDate'],
+                                                        cls._parse_timezone)
+
+        if not start_dt_parsed:
+          record_metrics['orphan_start_date'] += 1
           skip_record = True
+        if not end_dt_parsed:
+          record_metrics['orphan_end_date'] += 1
+          skip_record = True
+        
+        if start_dt_parsed and end_dt_parsed:
+          start_time_in_range = \
+              timeutil.DatetimeUtil.check_datetime_range(start_dt_parsed, start_date, end_date)
+          end_time_in_range = \
+              timeutil.DatetimeUtil.check_datetime_range(end_dt_parsed, start_date, end_date)
+          if not start_time_in_range or not end_time_in_range:
+            record_metrics['outside_date_range'] += 1
+            skip_record = True
       
       if not skip_record:
         t = child.attrib['type']
