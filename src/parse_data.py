@@ -11,9 +11,9 @@ def validate_params():
   if par.ParserParams.WRITE_DATA:
     assert par.ParserParams.PARSE_DATA
   
-  if par.AggregatorParams.OUT_FILENAME_SUFFIX:
-    assert par.AggregatorParams.OUT_FILENAME_SUFFIX[0] == '_'
-    assert not par.AggregatorParams.OUT_FILENAME_SUFFIX[-1] == '_'
+  if par.ParserParams.OUT_FILENAME_SUFFIX:
+    assert par.ParserParams.OUT_FILENAME_SUFFIX[0] == '_'
+    assert not par.ParserParams.OUT_FILENAME_SUFFIX[-1] == '_'
 
 def process_xml(in_tree, start_date, end_date, parse_timezone,
                 show_summary = False, parse_data = True):

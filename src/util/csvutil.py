@@ -1,6 +1,8 @@
 from csv import DictReader, DictWriter
 from datetime import datetime, date
 
+import params as par
+
 class CsvIO:
 
   _date_field_csv = 'date'
@@ -55,6 +57,11 @@ class CsvIO:
 
 class XmlToCsv:
 
+  _sum_type_records = set()
+  for rt in par.RecordParams.RECORD_TYPES:
+    if rt.aggregation == par.AggregateType.SUM:
+      _sum_type_records.add(rt.record)
+
   @classmethod
   def xml_dict_to_csv_dict(cls, records_by_date):
     data_dict = {}
@@ -63,5 +70,11 @@ class XmlToCsv:
         if d not in data_dict:
           data_dict[d] = {}
         data_dict[d][r] = records_by_date[r][d]
+    
+    # Record types that use a sum for aggregation must have 0s instead of missing values.
+    for d in data_dict:
+      for r in cls._sum_type_records:
+        if r not in data_dict[d]:
+          data_dict[d][r] = 0
     
     return data_dict
