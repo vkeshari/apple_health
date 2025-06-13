@@ -15,11 +15,12 @@ class ParserParams:
   END_DATE = date(2025, 3, 1)
   PARSE_TIMEZONE = ParseTimezone.DATA_TIMEZONE
 
-  PARSE_DATA = True
   SHOW_SUMMARY = False
+  PARSE_DATA = True
+  WRITE_DATA = True
 
-  SKIP_IPHONE_RECORDS = ['BasalEnergyBurned',
-                          'DistanceWalkingRunning',
+  # These records are double-counted by iPhone. Only include data from Apple Watch.
+  SKIP_IPHONE_RECORDS = ['DistanceWalkingRunning',
                           'FlightsClimbed',
                           'StepCount']
 
@@ -50,7 +51,6 @@ class RecordParams:
   RECORD_TYPES = [RecordType('ActiveEnergyBurned', 'Cal', AggregateType.SUM),
                   RecordType('AppleExerciseTime', 'min', AggregateType.SUM),
                   RecordType('AppleStandTime', 'min', AggregateType.SUM),
-                  RecordType('BasalEnergyBurned', 'Cal', AggregateType.SUM),
                   RecordType('BodyMass', 'kg', AggregateType.AVERAGE),
                   RecordType('DistanceWalkingRunning', 'km', AggregateType.SUM),
                   RecordType('FlightsClimbed', 'count', AggregateType.SUM),
@@ -67,3 +67,15 @@ class RecordParams:
                   RecordType('WalkingAsymmetryPercentage', '%', AggregateType.AVERAGE),
                   RecordType('WalkingDoubleSupportPercentage', '%', AggregateType.AVERAGE),
                   RecordType('WalkingSpeed', 'km/hr', AggregateType.MEDIAN)]
+
+class AggregatorParams:
+  FILENAME_SUFFIX =''
+
+  START_DATE = date(2021, 1, 1)
+  END_DATE = date(2025, 3, 1)
+  PARSE_TIMEZONE = ParseTimezone.DATA_TIMEZONE
+
+  WEEKLY_AGGREGATION = True
+  MONTHLY_AGGREGATION = True
+
+  WRITE_DATA = False
