@@ -79,3 +79,16 @@ class DatetimeUtil:
       return False
     
     return dt.date() >= start_date and dt.date() < end_date
+  
+class CalendarUtil:
+
+  _one_day = timedelta(days = 1)
+
+  @classmethod
+  def get_month_start_date(cls, d):
+    return date(d.year, d.month, 1)
+  
+  @classmethod
+  def get_week_start_date(cls, d):
+    day_of_week = d.weekday()
+    return d - day_of_week * cls._one_day

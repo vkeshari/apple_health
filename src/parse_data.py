@@ -1,4 +1,3 @@
-from csv import DictWriter
 from datetime import datetime
 from xml.etree import ElementTree as ET
 
@@ -11,16 +10,10 @@ from util import xml_parse as xpr
 def validate_params():
   if par.ParserParams.WRITE_DATA:
     assert par.ParserParams.PARSE_DATA
-
-def build_csv_dict(records_by_date):
-  data_dict = {}
-  for r in records_by_date:
-    for d in records_by_date[r]:
-      if d not in data_dict:
-        data_dict[d] = {}
-      data_dict[d][r] = records_by_date[r][d]
   
-  return data_dict
+  if par.AggregatorParams.OUT_FILENAME_SUFFIX:
+    assert par.AggregatorParams.OUT_FILENAME_SUFFIX[0] == '_'
+    assert not par.AggregatorParams.OUT_FILENAME_SUFFIX[-1] == '_'
 
 def process_xml(in_tree, start_date, end_date, parse_timezone,
                 show_summary = False, parse_data = True):
@@ -36,13 +29,10 @@ def process_xml(in_tree, start_date, end_date, parse_timezone,
   records_by_date = xpr.XmlParse.parse_xml_data(in_tree, start_date, end_date,
                                                 parse_timezone,
                                                 show_checkpoints = True)
-  print("DATA PROCESSED")
-
-  data_dict = build_csv_dict(records_by_date)
+  data_dict = csvutil.XmlToCsv.xml_dict_to_csv_dict(records_by_date)
   
-  processing_time = datetime.now() - start_time
   print()
-  print("Data processed in {}".format(processing_time))
+  print("Data processed in {}".format(datetime.now() - start_time))
 
   return data_dict
 
@@ -56,10 +46,9 @@ def parse_data():
 
   start_time = datetime.now()
   in_tree = ET.parse(in_xml)
-  parse_time = datetime.now() - start_time
 
   print()
-  print("Input read in {}".format(parse_time))
+  print("Input read in {}".format(datetime.now() - start_time))
 
   data_dict = process_xml(in_tree,
                             start_date = par.ParserParams.START_DATE,
@@ -76,9 +65,8 @@ def parse_data():
     out_csv = dio.get_parsed_csv_filepath(out_csv_filename)
     csvutil.CsvIO.write_data_csv(out_csv, data_dict)
 
-  total_time = datetime.now() - start_time
   print()
-  print("DONE in {}".format(total_time))
+  print("DONE in {}".format(datetime.now() - start_time))
 
 if __name__ == '__main__':
   parse_data()

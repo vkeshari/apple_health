@@ -78,4 +78,4 @@ class AggregatorParams:
   WEEKLY_AGGREGATION = True
   MONTHLY_AGGREGATION = True
 
-  WRITE_DATA = False
+  WRITE_DATA = True
