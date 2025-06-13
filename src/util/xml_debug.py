@@ -1,9 +1,18 @@
+import params as par
 from . import timeutil
 
 class XmlDebug:
   
-  _skip_dietary_data = True
-  _show_orphaned_dates = False
+  _skip_dietary_data = par.XmlDebugParams.SKIP_DIETARTY_DATA
+  _show_skipped_records = par.XmlDebugParams.SHOW_SKIPPED_RECORDS
+
+  _show_missing_unit_records = par.XmlDebugParams.SHOW_MISSING_UNIT_RECORDS
+
+  _show_orphaned_records = par.XmlDebugParams.SHOW_ORPHANED_RECORDS
+  _show_orphaned_dates = par.XmlDebugParams.SHOW_ORPHANED_DATES
+
+  _show_record_unit_counts = par.XmlDebugParams.SHOW_RECORD_UNIT_COUNTS
+  _show_record_source_counts = par.XmlDebugParams.SHOW_RECORD_SOURCE_COUNTS
 
   @classmethod
   def show_node_summary(cls, node):
@@ -28,6 +37,7 @@ class XmlDebug:
     cls.show_node_summary(root)
     
     type_unit_counts = {}
+    type_source_counts = {}
     orphan_date_records = {}
     record_metrics = {'total_records' : 0,
                       'missing_type' : 0,
@@ -36,6 +46,7 @@ class XmlDebug:
                       'orphan_start_date': 0,
                       'orphan_end_date': 0,
                       'outside_date_range': 0,
+                      'missing_source': 0,
                       'missing_unit' : 0,
                       'missing_value' : 0}
     missing_unit_record_types = set()
@@ -49,6 +60,9 @@ class XmlDebug:
       skip_record = False
       if 'type' not in child.attrib:
         record_metrics['missing_type'] += 1
+        skip_record = True
+      if 'sourceName' not in child.attrib:
+        record_metrics['missing_source'] += 1
         skip_record = True
       if 'unit' not in child.attrib:
         record_metrics['missing_unit'] += 1
@@ -107,25 +121,45 @@ class XmlDebug:
         if not tu_tuple in type_unit_counts:
           type_unit_counts[tu_tuple] = 0
         type_unit_counts[tu_tuple] += 1
+
+        s = child.attrib['sourceName']
+        ts_tuple = tuple([t, s])
+        if not ts_tuple in type_source_counts:
+          type_source_counts[ts_tuple] = 0
+        type_source_counts[ts_tuple] += 1
     
     print()
     print("RECORD SUMMARY")
     print(record_metrics)
-    print("MISSING UNIT RECORD TYPES: {}".format(len(missing_unit_record_types)))
-    print(missing_unit_record_types)
-    print("SKIPPED RECORD TYPES: {}".format(len(skipped_record_types)))
-    print(skipped_record_types)
-    print("ORPHAN DATE RECORDS")
-    for t in orphan_date_records:
-      print(t)
-      if cls._show_orphaned_dates:
-        print(sorted(orphan_date_records[t]))
+    if cls._show_missing_unit_records:
+      print("MISSING UNIT RECORD TYPES: {}".format(len(missing_unit_record_types)))
+      print(missing_unit_record_types)
+    if cls._show_skipped_records:
+      print("SKIPPED RECORD TYPES: {}".format(len(skipped_record_types)))
+      print(skipped_record_types)
+    if cls._show_orphaned_records:
+      print("ORPHAN DATE RECORDS")
+      for t in orphan_date_records:
+        print(t)
+        if cls._show_orphaned_dates:
+          print(sorted(orphan_date_records[t]))
     
-    print()
-    print("RECORD TYPES")
-    for i, tu in enumerate(sorted(type_unit_counts.keys())):
-      print("{index:3d}\t{count:8d}\t{unit:>10}\t{type}" \
-                .format(index = i,
-                        count = type_unit_counts[tu],
-                        unit = tu[1],
-                        type = tu[0]))
+    if cls._show_record_unit_counts:
+      print()
+      print("RECORD AND UNIT TYPES")
+      for i, tu in enumerate(sorted(type_unit_counts.keys())):
+        print("{index:3d}\t{count:8d}\t{unit:>10}\t{type}" \
+                  .format(index = i,
+                          count = type_unit_counts[tu],
+                          unit = tu[1],
+                          type = tu[0]))
+    
+    if cls._show_record_source_counts:
+      print()
+      print("RECORD AND SOURCE TYPES")
+      for i, ts in enumerate(sorted(type_source_counts.keys())):
+        print("{index:3d}\t{count:8d}\t{source:>10}\t{type}" \
+                  .format(index = i,
+                          count = type_source_counts[ts],
+                          source = ts[1],
+                          type = ts[0]))

@@ -21,11 +21,14 @@ def build_csv_dict(records_by_date):
   
   return fields, data_dict
 
-def process_xml(in_tree, start_date, end_date, parse_timezone, show_summary = False):
+def process_xml(in_tree, start_date, end_date, parse_timezone,
+                show_summary = False, parse_data = True):
   start_time = datetime.now()
   
   if show_summary:
     xdb.XmlDebug.show_tree_summary(in_tree, start_date, end_date, parse_timezone)
+  if not parse_data:
+    return None, None
   
   print()
   print("PROCESSING DATA")
@@ -61,10 +64,11 @@ def parse_data():
   dio = dataio.DataIO()
   in_xml = dio.get_raw_xml_filepath(par.ParserParams.INPUT_FILENAME)
 
-  out_csv_filename = "{tz}_{start}_{end}.csv".format(
+  out_csv_filename = "{tz}_{start}_{end}{suffix}.csv".format(
                         tz = par.ParserParams.PARSE_TIMEZONE.name,
                         start = par.ParserParams.START_DATE.strftime("%Y%m%d"),
-                        end = par.ParserParams.END_DATE.strftime("%Y%m%d"))
+                        end = par.ParserParams.END_DATE.strftime("%Y%m%d"),
+                        suffix = par.ParserParams.OUT_FILENAME_SUFFIX)
   out_csv = dio.get_parsed_csv_filepath(out_csv_filename)
 
   print("IN:\t{}".format(in_xml))
@@ -81,8 +85,10 @@ def parse_data():
                                   start_date = par.ParserParams.START_DATE,
                                   end_date = par.ParserParams.END_DATE,
                                   parse_timezone = par.ParserParams.PARSE_TIMEZONE,
-                                  show_summary = par.ParserParams.SHOW_SUMMARY)
-  write_data(fields, data_dict, out_csv)
+                                  show_summary = par.ParserParams.SHOW_SUMMARY,
+                                  parse_data = par.ParserParams.PARSE_DATA)
+  if par.ParserParams.PARSE_DATA:
+    write_data(fields, data_dict, out_csv)
 
   total_time = datetime.now() - start_time
   print()

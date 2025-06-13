@@ -6,7 +6,11 @@ from . import timeutil
 class XmlParse:
   _record_types = par.RecordParams.RECORD_TYPES
   _record_type_prefix = 'HKQuantityTypeIdentifier'
-  _checkpoint_every_n_records = 100000
+
+  _skip_iphone_records = par.ParserParams.SKIP_IPHONE_RECORDS
+  _iphone_source_text = 'iPhone'
+
+  _checkpoint_every_n_records = 1000000
 
   @classmethod
   def parse_xml_data(cls, xml_tree, start_date, end_date,
@@ -17,6 +21,8 @@ class XmlParse:
     records_by_date = {rt.record: {} for rt in cls._record_types}
     full_record_names = {r: cls._record_type_prefix + r for r in records_by_date}
     
+    skip_iphone_records_full_names = \
+        [cls._record_type_prefix + sir for sir in cls._skip_iphone_records]
     for i, record in enumerate(xml_tree.getroot().findall('Record')):
       if show_checkpoints and i % cls._checkpoint_every_n_records == 0:
         print ("Processed: {}".format(i))
@@ -24,6 +30,10 @@ class XmlParse:
                             datetime_string_from_xml = record.attrib['endDate'],
                             parse_timezone = parse_timezone)
       if not timeutil.DatetimeUtil.check_datetime_range(record_datetime, start_date, end_date):
+        continue
+
+      if record.attrib['type'] in skip_iphone_records_full_names \
+            and cls._iphone_source_text in record.attrib['sourceName']:
         continue
       
       for r in records_by_date:

@@ -9,12 +9,31 @@ class ParseTimezone(Enum):
 
 class ParserParams:
   INPUT_FILENAME = '20250530.xml'
+  OUT_FILENAME_SUFFIX = ''
 
   START_DATE = date(2021, 1, 1)
   END_DATE = date(2025, 3, 1)
   PARSE_TIMEZONE = ParseTimezone.DATA_TIMEZONE
 
+  PARSE_DATA = True
   SHOW_SUMMARY = False
+
+  SKIP_IPHONE_RECORDS = ['BasalEnergyBurned',
+                          'DistanceWalkingRunning',
+                          'FlightsClimbed',
+                          'StepCount']
+
+class XmlDebugParams:
+  SKIP_DIETARTY_DATA = True
+  SHOW_SKIPPED_RECORDS = False
+
+  SHOW_MISSING_UNIT_RECORDS = False
+
+  SHOW_ORPHANED_RECORDS = False
+  SHOW_ORPHANED_DATES = False
+
+  SHOW_RECORD_UNIT_COUNTS = False
+  SHOW_RECORD_SOURCE_COUNTS = True
 
 class AggregateType(Enum):
   SUM = 0
