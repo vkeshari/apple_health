@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime
 import numpy as np
 
 import dataio
@@ -10,6 +10,8 @@ def validate_params():
   if par.AggregatorParams.FILENAME_SUFFIX:
     assert par.AggregatorParams.FILENAME_SUFFIX[0] == '_'
     assert not par.AggregatorParams.FILENAME_SUFFIX[-1] == '_'
+
+  assert par.AggregatorParams.END_DATE > par.AggregatorParams.START_DATE
 
 def aggregate_data_by_period(daily_data_dict, period_start_date_fn = None):
   periodly_data_dict = {}

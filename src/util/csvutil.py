@@ -71,7 +71,8 @@ class XmlToCsv:
           data_dict[d] = {}
         data_dict[d][r] = records_by_date[r][d]
     
-    # Record types that use a sum for aggregation must have 0s instead of missing values.
+    # Record types that use a sum for aggregation must have 0s instead of missing values so that
+    #   averages are calculated correctly.
     for d in data_dict:
       for r in cls._sum_type_records:
         if r not in data_dict[d]:

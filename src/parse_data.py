@@ -15,6 +15,8 @@ def validate_params():
     assert par.ParserParams.OUT_FILENAME_SUFFIX[0] == '_'
     assert not par.ParserParams.OUT_FILENAME_SUFFIX[-1] == '_'
 
+  assert par.ParserParams.END_DATE > par.ParserParams.START_DATE
+
 def process_xml(in_tree, start_date, end_date, parse_timezone,
                 show_summary = False, parse_data = True):
   start_time = datetime.now()

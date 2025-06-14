@@ -60,13 +60,13 @@ class TimezoneUtil:
     
     return None
 
-DATETIME_FORMAT_XML = '%Y-%m-%d %H:%M:%S %z'
-
 class DatetimeUtil:
+
+  _datetime_formal_xml = '%Y-%m-%d %H:%M:%S %z'
 
   @classmethod
   def parse_xml_datetime(cls, datetime_string_from_xml, parse_timezone):
-    dt_parsed = datetime.strptime(datetime_string_from_xml, DATETIME_FORMAT_XML)
+    dt_parsed = datetime.strptime(datetime_string_from_xml, cls._datetime_formal_xml)
     
     if parse_timezone == par.ParseTimezone.DATA_TIMEZONE:
       return TimezoneUtil.adjust_datetime_timezone(dt_parsed)
