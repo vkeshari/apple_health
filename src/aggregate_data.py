@@ -44,7 +44,7 @@ def aggregate_data_by_week(daily_data_dict):
 
   return weekly_data_dict
 
-def aggregate_data_by_month(daily_data_dict, period_start_date_fn = None):
+def aggregate_data_by_month(daily_data_dict):
   start_time = datetime.now()
 
   monthly_data_dict = aggregate_data_by_period(

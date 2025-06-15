@@ -41,8 +41,8 @@ class ParseTimezone(Enum):
 
 class ParserParams:
   INPUT_FILENAME = '20250530.xml'
-  OUT_FILENAME_SUFFIX = ''
 
+  OUT_FILENAME_SUFFIX = ''
   START_DATE = date(2021, 1, 1)
   END_DATE = date(2025, 3, 1)
   PARSE_TIMEZONE = ParseTimezone.DATA_TIMEZONE
@@ -69,8 +69,8 @@ class XmlDebugParams:
   SHOW_RECORD_SOURCE_COUNTS = True
 
 class AggregatorParams:
+  # These are used only to decide what input file to read
   FILENAME_SUFFIX =''
-
   START_DATE = date(2021, 1, 1)
   END_DATE = date(2025, 3, 1)
   PARSE_TIMEZONE = ParseTimezone.DATA_TIMEZONE
@@ -79,3 +79,20 @@ class AggregatorParams:
   MONTHLY_AGGREGATION = True
 
   WRITE_DATA = True
+
+class GraphParams:
+  # These are used only to decide what input files to read
+  FILENAME_SUFFIX =''
+  DATA_START_DATE = date(2021, 1, 1)
+  DATA_END_DATE = date(2025, 3, 1)
+  PARSE_TIMEZONE = ParseTimezone.DATA_TIMEZONE
+
+  GRAPH_START_DATE = date(2021, 1, 1)
+  GRAPH_END_DATE = date(2025, 3, 1)
+
+  DAILY_GRAPHS = True
+  WEEKLY_GRAPHS = True
+  MONTHLY_GRAPHS = True
+
+  HISTOGRAMS = True
+  LINE_GPAPHS = True
