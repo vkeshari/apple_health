@@ -1,6 +1,7 @@
 from pathlib import Path
 from matplotlib import pyplot as plt
 
+import params as par
 from . import common
 from util import dataio
 from util import timeutil
@@ -10,6 +11,15 @@ class Histogram:
   _subfolder = Path('hist')
   _dio = dataio.DataIO()
 
+  _record_to_xmin = {}
+  _record_to_xmax = {}
+  _record_to_num_bins = {}
+  for rhl in par.RecordHistogramLimits.RECORD_HISTOGRAM_LIMITS:
+    record_type = rhl.record
+    _record_to_xmin[record_type] = rhl.xmin
+    _record_to_xmax[record_type] = rhl.xmax
+    _record_to_num_bins[record_type] = rhl.num_bins
+
   def __init__(self, record_type, record_units, record_aggregation_type,
                 start_date, end_date, period):
     self.record_type = record_type
@@ -18,6 +28,16 @@ class Histogram:
     self.start_date = start_date
     self.end_date = end_date
     self.period = period
+  
+  def get_xmin(self):
+    return self._record_to_xmin[self.record_type]
+
+  def get_xmax(self):
+    return self._record_to_xmax[self.record_type]
+  
+  def get_bin_count(self):
+    return self._record_to_num_bins[self.record_type]
+  
   
   def show_or_save(self, fig, show = False, save = False):
     if show:
@@ -39,7 +59,7 @@ class Histogram:
 class SingleSeriesHistogram(Histogram):
 
   _subfolder = Histogram._subfolder / 'singleseries'
-  _percentiles = [10, 20, 50, 80, 90, 95, 99]
+  _percentiles = [50, 90, 95]
 
   def __init__(self, data, record_type, record_units, record_aggregation_type,
                 start_date, end_date, period):
@@ -61,15 +81,18 @@ class SingleSeriesHistogram(Histogram):
     ax.set_xlabel(self.record_type)
     ax.set_ylabel("No. of {}".format(common.GraphTitle.get_period_text(self.period)))
 
-    data_series = list(sorted(self.data.values()))
-    data_series_average = common.DataMetrics.get_average(data_series)
-    data_series_percentiles = common.DataMetrics.get_percentiles(data_series, self._percentiles)
+    ax.set_xlim(self.get_xmin(), self.get_xmax())
 
-    ax.hist(data_series, bins = max(10, int(len(data_series) / 100)), \
-          # range = (750, 2050),
+    data_series = list(sorted(self.data.values()))
+
+    ax.hist(data_series, bins = self.get_bin_count(), \
+          range = (self.get_xmin(), self.get_xmax()),
           alpha = 0.8)
+  
+    data_series_average = common.DataMetrics.get_average(data_series)
+    plt.axvline(x = data_series_average, linestyle = '--', color = 'grey', alpha = 1.0)
+    data_series_percentiles = common.DataMetrics.get_percentiles(data_series, self._percentiles)
     for p in data_series_percentiles:
-      plt.axvline(x = data_series_average, linestyle = '--', color = 'grey', alpha = 1.0)
       plt.axvline(x = data_series_percentiles[p], linestyle = ':', color = 'grey', alpha = 0.8)
 
     self.show_or_save(fig, show = show, save = save)

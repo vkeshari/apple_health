@@ -85,6 +85,24 @@ class AggregatorParams:
   
   WRITE_DATA = True
 
+@dataclass
+class HistogramLimits:
+  record:     str
+  xmin:       int
+  xmax:       int
+  num_bins:   int
+
+class RecordHistogramLimits:
+  RECORD_HISTOGRAM_LIMITS = [
+      HistogramLimits('ActiveEnergyBurned', 600, 2400, 30),
+      HistogramLimits('AppleExerciseTime', 30, 330, 30),
+      HistogramLimits('AppleStandTime', 100, 550, 30),
+      HistogramLimits('DistanceWalkingRunning', 5, 35, 30),
+      HistogramLimits('FlightsClimbed', 0, 90, 30),
+      HistogramLimits('StepCount', 6000, 42000, 30),
+      HistogramLimits('TimeInDaylight', 0, 360, 30)]
+      
+
 class AggregateGraphParams:
   # These are used only to decide what input files to read
   FILENAME_SUFFIX =''
