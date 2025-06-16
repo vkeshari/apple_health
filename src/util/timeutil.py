@@ -75,11 +75,18 @@ class DatetimeUtil:
       return dt_parsed
 
   @classmethod
+  def check_date_range(cls, d, start_date, end_date):
+    if not d:
+      return False
+    
+    return d >= start_date and d < end_date
+
+  @classmethod
   def check_datetime_range(cls, dt, start_date, end_date):
     if not dt:
       return False
     
-    return dt.date() >= start_date and dt.date() < end_date
+    return cls.check_date_range(dt.date(), start_date, end_date)
   
 class CalendarUtil:
 

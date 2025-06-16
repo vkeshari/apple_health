@@ -1,14 +1,15 @@
 import dataio
 import params as par
 from util import csvutil
+from util import timeutil
 
 def validate_params():
-  if par.GraphParams.FILENAME_SUFFIX:
-    assert par.GraphParams.FILENAME_SUFFIX[0] == '_'
-    assert not par.GraphParams.FILENAME_SUFFIX[-1] == '_'
+  if par.AggregateGraphParams.FILENAME_SUFFIX:
+    assert par.AggregateGraphParams.FILENAME_SUFFIX[0] == '_'
+    assert not par.AggregateGraphParams.FILENAME_SUFFIX[-1] == '_'
 
-  assert par.GraphParams.DATA_END_DATE > par.GraphParams.DATA_START_DATE
-  assert par.GraphParams.GRAPH_END_DATE > par.GraphParams.GRAPH_START_DATE
+  assert par.AggregateGraphParams.DATA_END_DATE > par.AggregateGraphParams.DATA_START_DATE
+  assert par.AggregateGraphParams.GRAPH_END_DATE > par.AggregateGraphParams.GRAPH_START_DATE
 
 def get_records_by_aggregate_type():
   sum_type_records = set()
@@ -32,14 +33,19 @@ def get_records_units():
   
   return record_units
 
-def build_daily_graphs(daily_data_dict, sum_type_records, order_type_records, record_units):
-  pass
+def build_period_graphs(daily_data_dict, sum_type_records, order_type_records, record_units,
+                        start_date, end_date, period):
+  for r in sum_type_records:
+    r_by_date = {}
+    for d in daily_data_dict:
+      if not timeutil.DatetimeUtil.check_date_range(d, start_date, end_date):
+        continue
+      r_by_date[d] = daily_data_dict[d][r]
+  
+  r_by_sorted_date = {d: v for (d, v) in sorted(r_by_date.items())}
 
-def build_weekly_graphs(weekly_data_dict, sum_type_records, order_type_records, record_units):
-  pass
-
-def build_monthly_graphs(monthly_data_dict, sum_type_records, order_type_records, record_units):
-  pass
+  print()
+  print("Built data for {} graphs.".format(period.name.capitalize()))
 
 
 def build_graphs():
@@ -49,33 +55,24 @@ def build_graphs():
   record_units = get_records_units()
 
   dio = dataio.DataIO()
-  if par.GraphParams.DAILY_GRAPHS:
-    daily_csv_filename = "{tz}_{start}_{end}{suffix}.csv".format(
-                              tz = par.GraphParams.PARSE_TIMEZONE.name,
-                              start = par.GraphParams.DATA_START_DATE.strftime("%Y%m%d"),
-                              end = par.GraphParams.DATA_END_DATE.strftime("%Y%m%d"),
-                              suffix = par.GraphParams.FILENAME_SUFFIX)
-    daily_csv = dio.get_parsed_csv_filepath(daily_csv_filename)
-    daily_data_dict = csvutil.CsvIO.read_data_csv(daily_csv)
-    build_daily_graphs(daily_data_dict, sum_type_records, order_type_records, record_units)
-  if par.GraphParams.WEEKLY_GRAPHS:
-    weekly_csv_filename = "{tz}_{start}_{end}{suffix}_WEEKLY.csv".format(
-                              tz = par.GraphParams.PARSE_TIMEZONE.name,
-                              start = par.GraphParams.DATA_START_DATE.strftime("%Y%m%d"),
-                              end = par.GraphParams.DATA_END_DATE.strftime("%Y%m%d"),
-                              suffix = par.GraphParams.FILENAME_SUFFIX)
-    weekly_csv = dio.get_parsed_csv_filepath(weekly_csv_filename)
-    weekly_data_dict = csvutil.CsvIO.read_data_csv(weekly_csv)
-    build_weekly_graphs(weekly_data_dict, sum_type_records, order_type_records, record_units)
-  if par.GraphParams.MONTHLY_GRAPHS:
-    monthly_csv_filename = "{tz}_{start}_{end}{suffix}_MONTHLY.csv".format(
-                              tz = par.GraphParams.PARSE_TIMEZONE.name,
-                              start = par.GraphParams.DATA_START_DATE.strftime("%Y%m%d"),
-                              end = par.GraphParams.DATA_END_DATE.strftime("%Y%m%d"),
-                              suffix = par.GraphParams.FILENAME_SUFFIX)
-    monthly_csv = dio.get_parsed_csv_filepath(monthly_csv_filename)
-    monthly_data_dict = csvutil.CsvIO.read_data_csv(monthly_csv)
-    build_monthly_graphs(monthly_data_dict, sum_type_records, order_type_records, record_units)
+  for period in par.AggregateGraphParams.AGGREGATION_PERIODS:
+    if period == par.AggregationPeriod.DAILY:
+      period_text = ''
+    else:
+      period_text = '_' + period.name
+  
+    data_csv_filename = "{tz}_{start}_{end}{suffix}{period}.csv".format(
+                            tz = par.AggregateGraphParams.PARSE_TIMEZONE.name,
+                            start = par.AggregateGraphParams.DATA_START_DATE.strftime("%Y%m%d"),
+                            end = par.AggregateGraphParams.DATA_END_DATE.strftime("%Y%m%d"),
+                            suffix = par.AggregateGraphParams.FILENAME_SUFFIX,
+                            period = period_text)
+    data_csv = dio.get_parsed_csv_filepath(data_csv_filename)
+    data_dict = csvutil.CsvIO.read_data_csv(data_csv)
+    build_period_graphs(data_dict, sum_type_records, order_type_records, record_units,
+                        start_date = par.AggregateGraphParams.GRAPH_START_DATE,
+                        end_date = par.AggregateGraphParams.GRAPH_END_DATE,
+                        period = period)
 
 if __name__ == '__main__':
   build_graphs()
