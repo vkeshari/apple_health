@@ -16,16 +16,11 @@ def validate_params():
   assert par.AggregatorParams.END_DATE > par.AggregatorParams.START_DATE
 
 def aggregate_data_by_period(daily_data_dict, period):
-  if period == par.AggregationPeriod.WEEKLY:
-    period_start_date_fn = timeutil.CalendarUtil.get_week_start_date
-  elif period == par.AggregationPeriod.MONTHLY:
-    period_start_date_fn = timeutil.CalendarUtil.get_month_start_date
-  
   start_time = datetime.now()
 
   periodly_data_dict = {}
   for d in daily_data_dict:
-    period_start_date = period_start_date_fn(d)
+    period_start_date = timeutil.CalendarUtil.get_period_start_date(d, period)
     if period_start_date not in periodly_data_dict:
       periodly_data_dict[period_start_date] = {}
     for r in daily_data_dict[d]:

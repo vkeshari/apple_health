@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
+from dateutil import relativedelta as rd
 
 import params as par
 
@@ -87,10 +88,13 @@ class DatetimeUtil:
       return False
     
     return cls.check_date_range(dt.date(), start_date, end_date)
-  
+
+
 class CalendarUtil:
 
-  _one_day = timedelta(days = 1)
+  _one_day = rd.relativedelta(days = 1)
+  _one_week = rd.relativedelta(weeks = 1)
+  _one_month = rd.relativedelta(months = 1)
 
   @classmethod
   def get_month_start_date(cls, d):
@@ -100,3 +104,37 @@ class CalendarUtil:
   def get_week_start_date(cls, d):
     day_of_week = d.weekday()
     return d - day_of_week * cls._one_day
+  
+  @classmethod
+  def get_period_start_date(cls, d, period):
+    if period == par.AggregationPeriod.DAILY:
+      return d
+    elif period == par.AggregationPeriod.WEEKLY:
+      return cls.get_week_start_date(d)
+    elif period == par.AggregationPeriod.MONTHLY:
+      return cls.get_month_start_date(d)
+  
+  @classmethod
+  def get_next_day(cls, d):
+    return d + cls._one_day
+  
+  @classmethod
+  def get_next_week(cls, d):
+    return d + cls._one_week
+  
+  @classmethod
+  def get_next_month(cls, d):
+    return d + cls._one_month
+  
+  @classmethod
+  def get_next_period(cls, d, period):
+    if period == par.AggregationPeriod.DAILY:
+      return cls.get_next_day(d)
+    elif period == par.AggregationPeriod.WEEKLY:
+      return cls.get_next_week(d)
+    elif period == par.AggregationPeriod.MONTHLY:
+      return cls.get_next_month(d)
+  
+  @classmethod
+  def get_next_period_start_date(cls, d, period):
+    return cls.get_next_period(cls.get_period_start_date(d, period), period)
