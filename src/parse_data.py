@@ -1,9 +1,9 @@
 from datetime import datetime
 from xml.etree import ElementTree as ET
 
-import dataio
 import params as par
 from util import csvutil
+from util import dataio
 from util import xml_debug as xdb
 from util import xml_parse as xpr
 

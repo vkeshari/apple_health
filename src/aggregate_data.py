@@ -1,9 +1,9 @@
 from datetime import datetime
 import numpy as np
 
-import dataio
 import params as par
 from util import csvutil
+from util import dataio
 from util import timeutil
 
 def validate_params():

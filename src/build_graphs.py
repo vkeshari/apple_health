@@ -1,6 +1,7 @@
-import dataio
 import params as par
+from graph import histogram
 from util import csvutil
+from util import dataio
 from util import timeutil
 
 def validate_params():
@@ -40,9 +41,17 @@ def build_period_graphs(daily_data_dict, sum_type_records, order_type_records, r
     for d in daily_data_dict:
       if not timeutil.DatetimeUtil.check_date_range(d, start_date, end_date):
         continue
-      r_by_date[d] = daily_data_dict[d][r]
-  
-  r_by_sorted_date = {d: v for (d, v) in sorted(r_by_date.items())}
+      if not daily_data_dict[d][r] == 0:
+        r_by_date[d] = daily_data_dict[d][r]
+    r_by_sorted_date = {d: v for (d, v) in sorted(r_by_date.items())}
+
+    hist = histogram.SingleSeriesHistogram(data = r_by_sorted_date,
+                                            record_type = r,
+                                            record_units = record_units[r],
+                                            start_date = start_date,
+                                            end_date = end_date,
+                                            period = period)
+    hist.plot(show = False, save = True)
 
   print()
   print("Built data for {} graphs.".format(period.name.capitalize()))
