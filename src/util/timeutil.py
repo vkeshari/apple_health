@@ -11,7 +11,7 @@ class TimezonePeriod:
   tz:         timezone
 
 class TimezoneHistory:
-  _tz_pacific_daylight = timezone(-timedelta(hours = 8), name = 'PDT')
+  _tz_pacific_daylight = timezone(-timedelta(hours = 7), name = 'PDT')
   _tz_british_summer = timezone(timedelta(hours = 1), name = 'BST')
   _tz_india_standard = timezone(timedelta(hours = 5, minutes = 30), name = 'IST')
   _tz_china_standard = timezone(timedelta(hours = 8), name = 'CST')
