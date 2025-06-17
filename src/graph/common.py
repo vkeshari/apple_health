@@ -64,8 +64,8 @@ class DataMetrics:
     return data_percentiles
   
   @classmethod
-  def get_stats(cls, data_series, include_percentiles):
-    assert len(data_series) >= 10
+  def get_stats(cls, data_series, include_percentiles, top_values):
+    assert len(data_series) >= top_values
     data_series = sorted(data_series)
 
     data_stats = {}
@@ -74,7 +74,7 @@ class DataMetrics:
     data_stats['stdev'] = np.std(data_series)
     data_stats['skew'] = stats.skew(data_series)
     data_stats['kurtosis'] = stats.kurtosis(data_series)
-    data_stats['top_10'] = data_series[-10 : ]
+    data_stats['top_values'] = data_series[-top_values : ]
 
     percentiles_to_measure = set([5, 10, 25, 50, 75, 90, 95]) | set(include_percentiles)
     percentiles = cls.get_percentiles(data_series, percentiles_to_measure)

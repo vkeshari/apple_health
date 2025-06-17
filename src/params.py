@@ -86,22 +86,22 @@ class AggregatorParams:
   WRITE_DATA = True
 
 @dataclass
-class HistogramLimits:
+class HistogramParams:
   record:         str
   xmin:           int
   xmax:           int
   num_bins:       int
   text_precision: int
 
-class RecordHistogramLimits:
-  RECORD_HISTOGRAM_LIMITS = [
-      HistogramLimits('ActiveEnergyBurned', 600, 2400, 30, 0),
-      HistogramLimits('AppleExerciseTime', 30, 330, 30, 0),
-      HistogramLimits('AppleStandTime', 100, 550, 30, 0),
-      HistogramLimits('DistanceWalkingRunning', 5, 35, 30, 1),
-      HistogramLimits('FlightsClimbed', 0, 90, 30, 0),
-      HistogramLimits('StepCount', 6000, 42000, 30, 0),
-      HistogramLimits('TimeInDaylight', 0, 360, 30, 0)]
+class RecordHistogramParams:
+  RECORD_HISTOGRAM_PARAMS = [
+      HistogramParams('ActiveEnergyBurned', 600, 2400, 30, 0),
+      HistogramParams('AppleExerciseTime', 30, 330, 30, 0),
+      HistogramParams('AppleStandTime', 100, 550, 30, 0),
+      HistogramParams('DistanceWalkingRunning', 5, 35, 30, 1),
+      HistogramParams('FlightsClimbed', 0, 90, 30, 0),
+      HistogramParams('StepCount', 6000, 42000, 30, 0),
+      HistogramParams('TimeInDaylight', 0, 360, 30, 0)]
       
 class AggregateGraphParams:
   # These are used only to decide what input files to read
