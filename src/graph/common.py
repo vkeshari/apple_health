@@ -1,4 +1,5 @@
 import numpy as np
+from matplotlib import pyplot as plt
 from scipy import stats
 
 import params as par
@@ -36,6 +37,73 @@ class GraphText:
     title_text_3 = "{} to {}".format(start_date, end_date)
     
     return "{}: {}\n{}".format(title_text_1, title_text_2, title_text_3)
+  
+  @classmethod
+  def get_text_precision_format(cls, precision, variable = 'v'):
+    return "{" + variable + ":." + str(precision) + "f}"
+  
+  @classmethod
+  def get_range_precision_format(cls, precision, variables = ['v1', 'v2']):
+    return "{" + variables[0] + ":." + str(precision) + "f}" + " to " \
+              + "{" + variables[1] + ":." + str(precision) + "f}"
+
+class AnnotationPrinter:
+
+  def __init__(self, fontsize = 'medium', alpha = 0.8,
+                horizontalalignment = 'center', verticalalignment = 'center'):
+    self.fontsize = fontsize
+    self.alpha = alpha
+    self.horizontalalignment = horizontalalignment
+    self.verticalalignment = verticalalignment
+  
+  def plot_annotation(self, x, y, s):
+    plt.text(x = x, y = y, s = s,
+              alpha = self.alpha, fontsize = self.fontsize,
+              horizontalalignment = self.horizontalalignment,
+              verticalalignment = self.verticalalignment)
+
+class YPositioner:
+
+  def __init__(self, y_start, y_spacing):
+    self.y_start = y_start
+    self.y_spacing = y_spacing
+    self.y_current = y_start
+  
+  def next(self):
+    self.y_current -= self.y_spacing
+
+class GraphMultiTextPrinter:
+
+  def __init__(self, ylim, y_positioner, x = None,
+                horizontalalignment = 'center', verticalalignment = 'center'):
+    self.ylim = ylim
+    self.y_positioner = y_positioner
+    self.x = x
+    self.annotation_printer = AnnotationPrinter(horizontalalignment = horizontalalignment,
+                                                verticalalignment = verticalalignment)
+  
+  def get_y_current(self):
+    return self.y_positioner.y_current
+
+  def get_y_position(self):
+    return self.ylim * self.get_y_current()
+  
+  def newline(self):
+    self.y_positioner.next()
+  
+  def newlines(self, n):
+    for _ in range(n):
+      self.newline()
+  
+  def plot_annotation(self, s, x = None):
+    assert x or self.x
+
+    if x:
+      self.annotation_printer.plot_annotation(x = x, y = self.get_y_position(), s = s)
+    elif self.x:
+      self.annotation_printer.plot_annotation(x = self.x, y = self.get_y_position(), s = s)
+    self.newline()
+
 
 class DataMetrics:
 

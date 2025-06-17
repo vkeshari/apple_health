@@ -73,28 +73,19 @@ class Histogram:
     else:
       return list(range(0, ylim, 100)), []
   
-  def get_text_precision_format(self, precision, variable = 'v'):
-    return "{" + variable + ":." + str(precision) + "f}"
-  
-  def show_average(self, value, ylim, stat_height, stat_precision, annotate = False):
-    plt.axvline(x = value, ymax = stat_height,
+  def show_average(self, value, gmtp, value_format, annotate = False):
+    plt.axvline(x = value, ymax = gmtp.get_y_current(),
                 linestyle = '--', color = 'grey', alpha = 1.0)
     if annotate:
-      value_format = self.get_text_precision_format(stat_precision, variable = 'v')
-      plt.text(x = value, y = stat_height * ylim, alpha = 0.8,
-                s = ("Avg: " + value_format).format(v = value),
-                horizontalalignment = 'left', verticalalignment = 'bottom')
+      gmtp.plot_annotation(s = ("Avg: " + value_format).format(v = value), x = value)
   
-  def show_percentile(self, p, value, ylim, stat_height, stat_precision, annotate = False):
-    plt.axvline(x = value, ymax = stat_height,
+  def show_percentile(self, p, value, gmtp, value_format, annotate = False):
+    plt.axvline(x = value, ymax = gmtp.get_y_current(),
                 linestyle = ':', color = 'grey', alpha = 1.0)
     if annotate:
-      value_format = self.get_text_precision_format(stat_precision, variable = 'v')
-      plt.text(x = value, y = stat_height * ylim, alpha = 0.8,
-                s = ("p{p}: " + value_format).format(p = p, v = value),
-                horizontalalignment = 'left', verticalalignment = 'bottom')
+      gmtp.plot_annotation(s = ("p{p}: " + value_format).format(p = p, v = value), x = value)
   
-  def show_stats(self, data_series, percentiles, ylim, stat_precision,
+  def show_stats(self, data_series, percentiles, ylim, xlim, stat_precision,
                   show_average = False, annotate_average = False,
                   show_percentiles = False, annotate_percentiles = False,
                   show_normal_stats = False, show_order_stats = False, show_top_values = False):
@@ -108,40 +99,71 @@ class Histogram:
       percentiles_more_than_average = [p for p in percentiles \
                                           if data_stats['percentiles'][p] >= data_series_average]
     
-    stat_height = 1.00 - self._text_spacing_factor
+    y_positioner = common.YPositioner(y_start = 1.00 - self._text_spacing_factor,
+                                      y_spacing = self._text_spacing_factor)
+    gmtp = common.GraphMultiTextPrinter(ylim = ylim, y_positioner = y_positioner,
+                                        horizontalalignment = 'left',
+                                        verticalalignment = 'bottom')
+    
+    value_format = common.GraphText.get_text_precision_format(stat_precision, variable = 'v')
     if show_percentiles:
       for p in percentiles_less_than_average:
-        stat_height -= self._text_spacing_factor
-        self.show_percentile(p, data_stats['percentiles'][p],
-                              ylim, stat_height, stat_precision,
+        self.show_percentile(p, data_stats['percentiles'][p], gmtp, value_format,
                               annotate = annotate_percentiles)
     if show_average:
-      stat_height -= self._text_spacing_factor
-      self.show_average(data_series_average,
-                        ylim, stat_height, stat_precision,
+      self.show_average(data_series_average, gmtp, value_format,
                         annotate = annotate_average)
     if show_percentiles:
       for p in percentiles_more_than_average:
-        stat_height -= self._text_spacing_factor
-        self.show_percentile(p, data_stats['percentiles'][p],
-                              ylim, stat_height, stat_precision,
+        self.show_percentile(p, data_stats['percentiles'][p], gmtp, value_format,
                               annotate = annotate_percentiles)
     
-    stat_height = 1.00 - self._text_spacing_factor
+    y_positioner = common.YPositioner(y_start = 1.00 - self._text_spacing_factor,
+                                      y_spacing = self._text_spacing_factor)
+    gmtp = common.GraphMultiTextPrinter(ylim = ylim, y_positioner = y_positioner,
+                                        x = 0.99 * self.get_xmax(),
+                                        horizontalalignment = 'right',
+                                        verticalalignment = 'bottom')
+    gmtp.plot_annotation(s = "Total points: {v:d}".format(v = len(data_series)))
+    
     if show_normal_stats:
-      pass
+      gmtp.newline()
+      gmtp.plot_annotation(s = ("Mean: " + value_format).format(v = data_series_average))
+      gmtp.plot_annotation(s = ("Std Dev: " + value_format).format(v = data_stats['stdev']))
+      gmtp.plot_annotation(s = "Skew: {v:.1f}".format(v = data_stats['skew']))
+      gmtp.plot_annotation(s = "Kurtosis: {v:.1f}".format(v = data_stats['kurtosis']))
+    
     if show_order_stats:
-      pass
+      gmtp.newline()
+      gmtp.plot_annotation(s = ("Median: " + value_format).format(v = data_stats['median']))
+      
+      range_format = common.GraphText.get_range_precision_format(stat_precision,
+                                                                  variables = ['v1', 'v2'])
+      (mid50_low, mid50_high) = data_stats['middle_50']
+      gmtp.plot_annotation(s = ("Middle 50%: " + range_format) \
+                                  .format(v1 = mid50_low, v2 = mid50_high))
+      (mid80_low, mid80_high) = data_stats['middle_80']
+      gmtp.plot_annotation(s = ("Middle 80%: " + range_format) \
+                                  .format(v1 = mid80_low, v2 = mid80_high))
+      (mid90_low, mid90_high) = data_stats['middle_90']
+      gmtp.plot_annotation(s = ("Middle 90%: " + range_format) \
+                                  .format(v1 = mid90_low, v2 = mid90_high))
+    
     if show_top_values:
-      pass
-  
+      top_values_count = self.get_top_values_count()
+      gmtp.newline()
+      gmtp.plot_annotation(s = "Top {} values".format(top_values_count))
+      
+      top_n_values = data_stats['top_values'][-top_values_count : ]
+      for i in range(top_values_count):
+        gmtp.plot_annotation(s = value_format.format(v = top_n_values[-(i + 1)]))
+
   def show_or_save(self, fig, show = False, save = False):
     if show:
       fig.tight_layout()
       plt.show()
     if save:
-      save_filename = "{}_{}_{}_{}.png".format(self.record_type,
-                                                self.period.name,
+      save_filename = "{}_{}_{}_{}.png".format(self.record_type, self.period.name,
                                                 self.start_date.strftime("%Y%m%d"),
                                                 self.end_date.strftime("%Y%m%d"))
       save_file = self._dio.get_graph_filepath(self._subfolder / save_filename)
@@ -155,7 +177,7 @@ class Histogram:
 class SingleSeriesHistogram(Histogram):
 
   _subfolder = Histogram._subfolder / 'singleseries'
-  _percentiles = [50, 90, 95]
+  _percentiles = [50, 75, 90, 95]
 
   def __init__(self, data, record_type, record_units, record_aggregation_type,
                 start_date, end_date, period):
@@ -200,7 +222,7 @@ class SingleSeriesHistogram(Histogram):
             alpha = 0.8)
     
     self.show_stats(data_series, percentiles = self._percentiles, ylim = ylim,
-                    stat_precision = self.get_text_precision(),
+                    xlim = self.get_xmax(), stat_precision = self.get_text_precision(),
                     show_average = True, annotate_average = True,
                     show_percentiles = True, annotate_percentiles = True,
                     show_normal_stats = True, show_order_stats = True, show_top_values = True)
