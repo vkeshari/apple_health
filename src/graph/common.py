@@ -104,6 +104,28 @@ class GraphMultiTextPrinter:
       self.annotation_printer.plot_annotation(x = self.x, y = self.get_y_position(), s = s)
     self.newline()
 
+class GraphTickSpacer:
+  
+  @classmethod
+  def get_ticks(cls, lower, upper):
+    difference = upper - lower
+    if difference <= 10:
+      return list(range(lower, upper)), []
+    elif difference <= 20:
+      return list(range(lower, upper, 2)), list(range(lower, upper))
+    elif difference <= 50:
+      return list(range(lower, upper, 5)), list(range(lower, upper))
+    elif difference <= 100:
+      return list(range(lower, upper, 10)), list(range(lower, upper, 2))
+    elif difference <= 200:
+      return list(range(lower, upper, 20)), list(range(lower, upper, 5))
+    elif difference <= 500:
+      return list(range(lower, upper, 50)), list(range(lower, upper, 10))
+    elif difference <= 1000:
+      return list(range(lower, upper, 100)), list(range(lower, upper, 20))
+    else:
+      return list(range(lower, upper, 100)), []
+
 
 class DataMetrics:
 

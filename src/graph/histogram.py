@@ -1,6 +1,7 @@
 import numpy as np
 from pathlib import Path
 from matplotlib import pyplot as plt
+from matplotlib.patches import Rectangle
 
 import params as par
 from . import common
@@ -47,6 +48,13 @@ class Histogram:
   def get_text_precision(self):
     return self._record_to_text_precision[self.record_type]
   
+  def get_hist_bins(self):
+    return np.linspace(self.get_xmin(), self.get_xmax(), self.get_bin_count() + 1)
+
+  def get_ylim(self, data_series):
+    data_hist_vals, _ = np.histogram(data_series, bins = self.get_hist_bins())
+    return int(max(data_hist_vals) * 1.25)
+
   def get_top_values_count(self):
     if self.period == par.AggregationPeriod.DAILY:
       return 10
@@ -55,24 +63,7 @@ class Histogram:
     elif self.period == par.AggregationPeriod.MONTHLY:
       return 3
   
-  def get_yticks(self, ylim):
-    if ylim <= 10:
-      return list(range(ylim)), []
-    elif ylim <= 20:
-      return list(range(0, ylim, 2)), list(range(ylim))
-    elif ylim <= 50:
-      return list(range(0, ylim, 5)), list(range(ylim))
-    elif ylim <= 100:
-      return list(range(0, ylim, 10)), list(range(0, ylim, 2))
-    elif ylim <= 200:
-      return list(range(0, ylim, 20)), list(range(0, ylim, 5))
-    elif ylim <= 500:
-      return list(range(0, ylim, 50)), list(range(0, ylim, 10))
-    elif ylim <= 1000:
-      return list(range(0, ylim, 100)), list(range(0, ylim, 20))
-    else:
-      return list(range(0, ylim, 100)), []
-  
+
   def show_average(self, value, gmtp, value_format, annotate = False):
     plt.axvline(x = value, ymax = gmtp.get_y_current(),
                 linestyle = '--', color = 'grey', alpha = 1.0)
@@ -85,19 +76,29 @@ class Histogram:
     if annotate:
       gmtp.plot_annotation(s = ("p{p}: " + value_format).format(p = p, v = value), x = value)
   
-  def show_stats(self, data_series, percentiles, ylim, xlim, stat_precision,
-                  show_average = False, annotate_average = False,
+  def show_interval(self, ax, ylim, x_low, x_high):
+    ax.add_patch(Rectangle((x_low, 0), height = ylim, width = x_high - x_low,
+                            linewidth = 0, alpha = 0.2, fill = True))
+
+  def show_stats(self, ax, data_series, percentiles, ylim,
+                  show_total_count = False, show_average = False, annotate_average = False,
                   show_percentiles = False, annotate_percentiles = False,
-                  show_normal_stats = False, show_order_stats = False, show_top_values = False):
+                  show_normal_stats = False, show_order_stats = False,
+                  show_top_values = False, show_intervals = False):
+    xlim = self.get_xmax()
+    stat_precision = self.get_text_precision()
+
     data_stats = common.DataMetrics.get_stats(data_series, include_percentiles = percentiles,
                                               top_values = self.get_top_values_count())
-    data_series_average = data_stats['average']
+    (mid50_low, mid50_high) = data_stats['middle_50']
+    (mid80_low, mid80_high) = data_stats['middle_80']
+    (mid90_low, mid90_high) = data_stats['middle_90']
 
     if show_percentiles:
       percentiles_less_than_average = [p for p in percentiles \
-                                          if data_stats['percentiles'][p] < data_series_average]
+                                          if data_stats['percentiles'][p] < data_stats['average']]
       percentiles_more_than_average = [p for p in percentiles \
-                                          if data_stats['percentiles'][p] >= data_series_average]
+                                          if data_stats['percentiles'][p] >= data_stats['average']]
     
     y_positioner = common.YPositioner(y_start = 1.00 - self._text_spacing_factor,
                                       y_spacing = self._text_spacing_factor)
@@ -111,24 +112,31 @@ class Histogram:
         self.show_percentile(p, data_stats['percentiles'][p], gmtp, value_format,
                               annotate = annotate_percentiles)
     if show_average:
-      self.show_average(data_series_average, gmtp, value_format,
+      self.show_average(data_stats['average'], gmtp, value_format,
                         annotate = annotate_average)
     if show_percentiles:
       for p in percentiles_more_than_average:
         self.show_percentile(p, data_stats['percentiles'][p], gmtp, value_format,
                               annotate = annotate_percentiles)
     
+    if show_intervals:
+      self.show_interval(ax, ylim, mid50_low, mid50_high)
+      self.show_interval(ax, ylim, mid80_low, mid80_high)
+      self.show_interval(ax, ylim, mid90_low, mid90_high)
+    
     y_positioner = common.YPositioner(y_start = 1.00 - self._text_spacing_factor,
                                       y_spacing = self._text_spacing_factor)
     gmtp = common.GraphMultiTextPrinter(ylim = ylim, y_positioner = y_positioner,
-                                        x = 0.99 * self.get_xmax(),
+                                        x = 0.99 * xlim,
                                         horizontalalignment = 'right',
                                         verticalalignment = 'bottom')
-    gmtp.plot_annotation(s = "Total points: {v:d}".format(v = len(data_series)))
+    
+    if show_total_count:
+      gmtp.plot_annotation(s = "Total points: {v:d}".format(v = len(data_series)))
     
     if show_normal_stats:
       gmtp.newline()
-      gmtp.plot_annotation(s = ("Mean: " + value_format).format(v = data_series_average))
+      gmtp.plot_annotation(s = ("Mean: " + value_format).format(v = data_stats['average']))
       gmtp.plot_annotation(s = ("Std Dev: " + value_format).format(v = data_stats['stdev']))
       gmtp.plot_annotation(s = "Skew: {v:.1f}".format(v = data_stats['skew']))
       gmtp.plot_annotation(s = "Kurtosis: {v:.1f}".format(v = data_stats['kurtosis']))
@@ -139,13 +147,10 @@ class Histogram:
       
       range_format = common.GraphText.get_range_precision_format(stat_precision,
                                                                   variables = ['v1', 'v2'])
-      (mid50_low, mid50_high) = data_stats['middle_50']
       gmtp.plot_annotation(s = ("Middle 50%: " + range_format) \
                                   .format(v1 = mid50_low, v2 = mid50_high))
-      (mid80_low, mid80_high) = data_stats['middle_80']
       gmtp.plot_annotation(s = ("Middle 80%: " + range_format) \
                                   .format(v1 = mid80_low, v2 = mid80_high))
-      (mid90_low, mid90_high) = data_stats['middle_90']
       gmtp.plot_annotation(s = ("Middle 90%: " + range_format) \
                                   .format(v1 = mid90_low, v2 = mid90_high))
     
@@ -158,14 +163,11 @@ class Histogram:
       for i in range(top_values_count):
         gmtp.plot_annotation(s = value_format.format(v = top_n_values[-(i + 1)]))
 
-  def show_or_save(self, fig, show = False, save = False):
+  def show_or_save(self, fig, show = False, save_filename = None):
     if show:
       fig.tight_layout()
       plt.show()
-    if save:
-      save_filename = "{}_{}_{}_{}.png".format(self.record_type, self.period.name,
-                                                self.start_date.strftime("%Y%m%d"),
-                                                self.end_date.strftime("%Y%m%d"))
+    if save_filename:
       save_file = self._dio.get_graph_filepath(self._subfolder / save_filename)
       fig.tight_layout()
       save_file.parent.mkdir(exist_ok = True, parents = True)
@@ -203,28 +205,32 @@ class SingleSeriesHistogram(Histogram):
 
     ax.set_xlim(self.get_xmin(), self.get_xmax())
 
-    hist_bins = np.linspace(self.get_xmin(), self.get_xmax(), self.get_bin_count() + 1)
+    hist_bins = self.get_hist_bins()
     ax.set_xticks(hist_bins[ : : self._major_x_ticks_spacing])
     ax.set_xticks(hist_bins, minor = True)
     ax.grid(True, which = 'both', axis = 'x', alpha = 0.3)
 
-    data_hist_vals, _ = np.histogram(data_series, bins = hist_bins)
-    ylim = int(max(data_hist_vals) * 1.25)
+    ylim = self.get_ylim(data_series)
     ax.set_ylim(0, ylim)
-    yticks_major, yticks_minor = self.get_yticks(ylim)
+    yticks_major, yticks_minor = common.GraphTickSpacer.get_ticks(0, ylim)
     ax.set_yticks(yticks_major)
     ax.set_yticks(yticks_minor, minor = True)
     ax.grid(True, which = 'minor', axis = 'y', alpha = 0.3)
     ax.grid(True, which = 'major', axis = 'y', alpha = 0.5)
 
-    ax.hist(data_series, bins = self.get_bin_count(), \
+    ax.hist(data_series, bins = self.get_bin_count(),
             range = (self.get_xmin(), self.get_xmax()),
             alpha = 0.8)
     
-    self.show_stats(data_series, percentiles = self._percentiles, ylim = ylim,
-                    xlim = self.get_xmax(), stat_precision = self.get_text_precision(),
+    self.show_stats(ax, data_series, percentiles = self._percentiles, ylim = ylim,
                     show_average = True, annotate_average = True,
                     show_percentiles = True, annotate_percentiles = True,
-                    show_normal_stats = True, show_order_stats = True, show_top_values = True)
-
-    self.show_or_save(fig, show = show, save = save)
+                    show_total_count = True, show_normal_stats = True, show_order_stats = True,
+                    show_top_values = True, show_intervals = True)
+    if save:
+      save_filename = "{}_{}_{}_{}.png".format(self.record_type, self.period.name,
+                                                self.start_date.strftime("%Y%m%d"),
+                                                self.end_date.strftime("%Y%m%d"))
+      self.show_or_save(fig, show = show, save_filename = save_filename)
+    else:
+      self.show_or_save(fig, show = show)
