@@ -87,7 +87,7 @@ class GraphText:
 
   @classmethod
   def get_graph_title(cls, record_type, record_unit, start_date, end_date,
-                      record_aggregation_type, period, split_name = ''):
+                      record_aggregation_type, period, bucketing_name = ''):
     record_aggregation_text = cls.get_aggregation_type_text(record_aggregation_type)
     title_text_1 = "{} ({})".format(record_type, record_unit)
     if period == par.AggregationPeriod.DAILY:
@@ -96,8 +96,8 @@ class GraphText:
       title_text_2 = "{} Averages of Daily {}".format(period.name.capitalize(),
                                                       record_aggregation_text)
     title_text_3 = "{} to {}".format(start_date, end_date)
-    if split_name:
-      title_text_3 += " (split {})".format(split_name)
+    if bucketing_name:
+      title_text_3 += " (split {})".format(bucketing_name)
     return "{}: {}\n{}".format(title_text_1, title_text_2, title_text_3)
   
   @classmethod

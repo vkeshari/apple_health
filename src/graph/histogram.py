@@ -1,5 +1,6 @@
 import numpy as np
 from pathlib import Path
+from matplotlib import colors as mcolors
 from matplotlib import pyplot as plt
 from matplotlib.patches import Rectangle
 
@@ -68,23 +69,23 @@ class Histogram:
     self.ax.grid(True, which = 'major', axis = 'y', alpha = 0.5)
   
 
-  def show_average(self, value, gmtp, value_format, annotate = False):
+  def show_average(self, value, gmtp, value_format, color, annotate = False):
     plt.axvline(x = value, ymax = gmtp.get_y_current(),
-                linestyle = '--', color = 'grey', alpha = 1.0)
+                color = color, linestyle = '--', alpha = 1.0)
     if annotate:
       gmtp.plot_annotation(s = ("Avg: " + value_format).format(v = value), x = value)
   
-  def show_percentile(self, p, value, gmtp, value_format, annotate = False):
+  def show_percentile(self, p, value, gmtp, value_format, color, annotate = False):
     plt.axvline(x = value, ymax = gmtp.get_y_current(),
-                linestyle = ':', color = 'grey', alpha = 1.0)
+                color = color, linestyle = ':', alpha = 1.0)
     if annotate:
       gmtp.plot_annotation(s = ("p{p}: " + value_format).format(p = p, v = value), x = value)
   
-  def show_interval(self, ylim, x_low, x_high):
+  def show_interval(self, ylim, color, x_low, x_high):
     self.ax.add_patch(Rectangle((x_low, 0), height = ylim, width = x_high - x_low,
-                            linewidth = 0, alpha = 0.2, fill = True))
+                                linewidth = 0, alpha = 0.2, fill = True, facecolor = color))
 
-  def show_stats(self, data_series, percentiles, ylim,
+  def show_stats(self, data_series, percentiles, ylim, color = None,
                   show_total_count = False, show_average = False, annotate_average = False,
                   show_percentiles = False, annotate_percentiles = False,
                   show_normal_stats = False, show_order_stats = False,
@@ -114,20 +115,20 @@ class Histogram:
     value_format = common.GraphText.get_text_precision_format(stat_precision, variable = 'v')
     if show_percentiles:
       for p in percentiles_less_than_average:
-        self.show_percentile(p, data_stats['percentiles'][p], gmtp, value_format,
+        self.show_percentile(p, data_stats['percentiles'][p], gmtp, value_format, color,
                               annotate = annotate_percentiles)
     if show_average:
-      self.show_average(data_stats['average'], gmtp, value_format,
+      self.show_average(data_stats['average'], gmtp, value_format, color,
                         annotate = annotate_average)
     if show_percentiles:
       for p in percentiles_more_than_average:
-        self.show_percentile(p, data_stats['percentiles'][p], gmtp, value_format,
+        self.show_percentile(p, data_stats['percentiles'][p], gmtp, value_format, color,
                               annotate = annotate_percentiles)
     
     if show_intervals:
-      self.show_interval(ylim, mid50_low, mid50_high)
-      self.show_interval(ylim, mid80_low, mid80_high)
-      self.show_interval(ylim, mid90_low, mid90_high)
+      self.show_interval(ylim, color, mid50_low, mid50_high)
+      self.show_interval(ylim, color, mid80_low, mid80_high)
+      self.show_interval(ylim, color, mid90_low, mid90_high)
     
     y_positioner = common.YPositioner(y_start = 1.00 - self._text_spacing_factor,
                                       y_spacing = self._text_spacing_factor)
@@ -184,6 +185,7 @@ class SingleSeriesHistogram(Histogram):
 
   _subfolder = Histogram._subfolder / 'singleseries' / timeutil.Timestamp.get_timestamp()
   _percentiles = [50, 75, 90, 95]
+  _color = 'tab:blue'
 
   def __init__(self, data, record_type, record_units, record_aggregation_type,
                 start_date, end_date, period):
@@ -208,8 +210,9 @@ class SingleSeriesHistogram(Histogram):
   def plot(self, show = False, save = False):
     self.ax.hist(self.data_series, bins = self.get_bin_count(),
                   range = (self.get_xmin(), self.get_xmax()),
-                  alpha = 0.8)
-    self.show_stats(self.data_series, percentiles = self._percentiles, ylim = self.ylim,
+                  color = self._color, alpha = 0.8)
+    self.show_stats(self.data_series, percentiles = self._percentiles,
+                    ylim = self.ylim, color = self._color,
                     show_average = True, annotate_average = True,
                     show_percentiles = True, annotate_percentiles = True,
                     show_total_count = True, show_normal_stats = True, show_order_stats = True,
@@ -227,19 +230,20 @@ class MultiSeriesHistogram(Histogram):
 
   _subfolder = Histogram._subfolder / 'multiseries' / timeutil.Timestamp.get_timestamp()
   _percentiles = []
+  _colors = list(mcolors.TABLEAU_COLORS.values())
 
-  def __init__(self, split_name, datasets, record_type, record_units, record_aggregation_type,
+  def __init__(self, bucketing_name, datasets, record_type, record_units, record_aggregation_type,
                 start_date, end_date, period):
     Histogram.__init__(self, record_type, record_units, record_aggregation_type,
                         start_date, end_date, period)
-    self.split_name = split_name
+    self.bucketing_name = bucketing_name
     self.labels = list(datasets.keys())
     self.data_series = [sorted(datasets[l].values()) for l in self.labels]
     self.ylim = max([self.get_ylim(ds) for ds in self.data_series])
 
-    actual_start_date = min([max(min(data.keys()), start_date) for data in self.data_series])
+    actual_start_date = max(min([min(data.keys()) for data in datasets.values()]), start_date)
     self.start_date = timeutil.CalendarUtil.get_period_start_date(actual_start_date, period)
-    actual_end_date = max([min(max(data.keys()), end_date) for data in self.data_series])
+    actual_end_date = min(max([max(data.keys()) for data in datasets.values()]), end_date)
     self.end_date = timeutil.CalendarUtil.get_next_period_start_date(actual_end_date, period)
     
     self.init_plot()
@@ -248,19 +252,23 @@ class MultiSeriesHistogram(Histogram):
     title_text = common.GraphText.get_graph_title(self.record_type, self.record_units,
                                                   self.start_date, self.end_date,
                                                   self.record_aggregation_type, self.period,
-                                                  self.split_name)
+                                                  self.bucketing_name)
     Histogram.init_plot(self, title_text, self.ylim)
 
   def plot(self, show = False, save = False):
-    for ds in self.data_series:
-      self.ax.hist(ds, bins = self.get_bin_count(),
-                    range = (self.get_xmin(), self.get_xmax()),
-                    alpha = 0.2)
-      self.show_stats(ds, percentiles = self._percentiles, ylim = self.ylim, show_average = True)
-    self.ax.legend(labels = self.labels, loc = 'upper right')
+    hists = []
+    for i, ds in enumerate(self.data_series):
+      c = self._colors[i]
+      _, _, hist = self.ax.hist(ds, bins = self.get_bin_count(),
+                                range = (self.get_xmin(), self.get_xmax()),
+                                color = c, alpha = 0.3)
+      hists.append(hist)
+      self.show_stats(ds, percentiles = self._percentiles, ylim = self.ylim,
+                      color = c, show_average = True)
+    self.ax.legend(handles = hists, labels = self.labels, loc = 'upper right')
     
     if save:
-      save_filename = "{}_{}_{}_{}_{}.png".format(self.split_name,
+      save_filename = "{}_{}_{}_{}_{}.png".format(self.bucketing_name,
                                                   self.record_type, self.period.name,
                                                   self.start_date.strftime("%Y%m%d"),
                                                   self.end_date.strftime("%Y%m%d"))
