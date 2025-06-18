@@ -198,7 +198,7 @@ class Histogram:
 
 class SingleSeriesHistogram(Histogram):
 
-  _subfolder = Histogram._subfolder / 'singleseries'
+  _subfolder = Histogram._subfolder / 'singleseries' / common.Timestamp.get_timestamp()
   _percentiles = [50, 75, 90, 95]
 
   def __init__(self, data, record_type, record_units, record_aggregation_type,
@@ -217,15 +217,14 @@ class SingleSeriesHistogram(Histogram):
   
   def init_plot(self):
     title_text = common.GraphText.get_graph_title(self.record_type, self.record_units,
-                                                        self.start_date, self.end_date,
-                                                        self.record_aggregation_type, self.period)
+                                                  self.start_date, self.end_date,
+                                                  self.record_aggregation_type, self.period)
     Histogram.init_plot(self, title_text, self.ylim)
 
   def plot(self, show = False, save = False):
     self.ax.hist(self.data_series, bins = self.get_bin_count(),
                   range = (self.get_xmin(), self.get_xmax()),
                   alpha = 0.8)
-    
     self.show_stats(self.data_series, percentiles = self._percentiles, ylim = self.ylim,
                     show_average = True, annotate_average = True,
                     show_percentiles = True, annotate_percentiles = True,
@@ -235,6 +234,52 @@ class SingleSeriesHistogram(Histogram):
       save_filename = "{}_{}_{}_{}.png".format(self.record_type, self.period.name,
                                                 self.start_date.strftime("%Y%m%d"),
                                                 self.end_date.strftime("%Y%m%d"))
+      self.show_or_save(show = show, save_filename = save_filename)
+    else:
+      self.show_or_save(show = show)
+
+
+class MultiSeriesHistogram(Histogram):
+
+  _subfolder = Histogram._subfolder / 'multiseries' / common.Timestamp.get_timestamp()
+  _percentiles = []
+
+  def __init__(self, split_name, datasets, record_type, record_units, record_aggregation_type,
+                start_date, end_date, period):
+    Histogram.__init__(self, record_type, record_units, record_aggregation_type,
+                        start_date, end_date, period)
+    self.split_name = split_name
+    self.labels = list(datasets.keys())
+    self.data_series = [sorted(datasets[l].values()) for l in self.labels]
+    self.ylim = max([self.get_ylim(ds) for ds in self.data_series])
+
+    actual_start_date = min([max(min(data.keys()), start_date) for data in self.data_series])
+    self.start_date = timeutil.CalendarUtil.get_period_start_date(actual_start_date, period)
+    actual_end_date = max([min(max(data.keys()), end_date) for data in self.data_series])
+    self.end_date = timeutil.CalendarUtil.get_next_period_start_date(actual_end_date, period)
+    
+    self.init_plot()
+  
+  def init_plot(self):
+    title_text = common.GraphText.get_graph_title(self.record_type, self.record_units,
+                                                  self.start_date, self.end_date,
+                                                  self.record_aggregation_type, self.period,
+                                                  self.split_name)
+    Histogram.init_plot(self, title_text, self.ylim)
+
+  def plot(self, show = False, save = False):
+    for ds in self.data_series:
+      self.ax.hist(ds, bins = self.get_bin_count(),
+                    range = (self.get_xmin(), self.get_xmax()),
+                    alpha = 0.2)
+      self.show_stats(ds, percentiles = self._percentiles, ylim = self.ylim, show_average = True)
+    self.ax.legend(labels = self.labels, loc = 'upper right')
+    
+    if save:
+      save_filename = "{}_{}_{}_{}_{}.png".format(self.split_name,
+                                                  self.record_type, self.period.name,
+                                                  self.start_date.strftime("%Y%m%d"),
+                                                  self.end_date.strftime("%Y%m%d"))
       self.show_or_save(show = show, save_filename = save_filename)
     else:
       self.show_or_save(show = show)

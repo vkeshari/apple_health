@@ -1,8 +1,70 @@
 import numpy as np
+from datetime import datetime
 from matplotlib import pyplot as plt
 from scipy import stats
 
 import params as par
+
+class Timestamp:
+
+  _timestamp_format = '%Y%m%d%H%M%S'
+
+  @classmethod
+  def get_timestamp(cls):
+    return datetime.now().strftime(cls._timestamp_format)
+
+
+class DataMetrics:
+
+  @classmethod
+  def get_average(cls, data_series):
+    return np.average(data_series)
+  
+  @classmethod
+  def get_percentile(cls, data_series, p):
+    assert 0 < p < 100
+
+    return np.percentile(data_series, p, method = 'nearest')
+
+  @classmethod
+  def get_median(cls, data_series):
+    return cls.get_percentile(data_series, 50)
+
+  @classmethod
+  def get_percentiles(cls, data_series, percentiles):
+    assert all([0 < p < 100 for p in percentiles])
+
+    data_percentiles = {}
+    for p in percentiles:
+      data_percentiles[p] = cls.get_percentile(data_series, p)
+    
+    return data_percentiles
+  
+  @classmethod
+  def get_stats(cls, data_series, include_percentiles, top_values):
+    assert len(data_series) >= top_values
+    data_series = sorted(data_series)
+
+    data_stats = {}
+    data_stats['average'] = cls.get_average(data_series)
+    data_stats['median'] = cls.get_median(data_series)
+    data_stats['stdev'] = np.std(data_series)
+    data_stats['skew'] = stats.skew(data_series)
+    data_stats['kurtosis'] = stats.kurtosis(data_series)
+    data_stats['top_values'] = data_series[-top_values : ]
+
+    percentiles_to_measure = set([5, 10, 25, 50, 75, 90, 95]) | set(include_percentiles)
+    percentiles = cls.get_percentiles(data_series, percentiles_to_measure)
+
+    data_stats['percentiles'] = {}
+    for p in percentiles:
+      data_stats['percentiles'][p] = percentiles[p]
+    data_stats['middle_50'] = tuple([percentiles[25], percentiles[75]])
+    data_stats['middle_80'] = tuple([percentiles[10], percentiles[90]])
+    data_stats['middle_90'] = tuple([percentiles[5], percentiles[95]])
+
+    return data_stats
+
 
 class GraphText:
 
@@ -26,7 +88,7 @@ class GraphText:
 
   @classmethod
   def get_graph_title(cls, record_type, record_unit, start_date, end_date,
-                      record_aggregation_type, period):
+                      record_aggregation_type, period, split_name = ''):
     record_aggregation_text = cls.get_aggregation_type_text(record_aggregation_type)
     title_text_1 = "{} ({})".format(record_type, record_unit)
     if period == par.AggregationPeriod.DAILY:
@@ -35,7 +97,8 @@ class GraphText:
       title_text_2 = "{} Averages of Daily {}".format(period.name.capitalize(),
                                                       record_aggregation_text)
     title_text_3 = "{} to {}".format(start_date, end_date)
-    
+    if split_name:
+      title_text_3 += " (split {})".format(split_name)
     return "{}: {}\n{}".format(title_text_1, title_text_2, title_text_3)
   
   @classmethod
@@ -125,56 +188,3 @@ class GraphTickSpacer:
       return list(range(lower, upper, 100)), list(range(lower, upper, 20))
     else:
       return list(range(lower, upper, 100)), []
-
-
-class DataMetrics:
-
-  @classmethod
-  def get_average(cls, data_series):
-    return np.average(data_series)
-  
-  @classmethod
-  def get_percentile(cls, data_series, p):
-    assert 0 < p < 100
-
-    return np.percentile(data_series, p, method = 'nearest')
-
-  @classmethod
-  def get_median(cls, data_series):
-    return cls.get_percentile(data_series, 50)
-
-  @classmethod
-  def get_percentiles(cls, data_series, percentiles):
-    assert all([0 < p < 100 for p in percentiles])
-
-    data_percentiles = {}
-    for p in percentiles:
-      data_percentiles[p] = cls.get_percentile(data_series, p)
-    
-    return data_percentiles
-  
-  @classmethod
-  def get_stats(cls, data_series, include_percentiles, top_values):
-    assert len(data_series) >= top_values
-    data_series = sorted(data_series)
-
-    data_stats = {}
-    data_stats['average'] = cls.get_average(data_series)
-    data_stats['median'] = cls.get_median(data_series)
-    data_stats['stdev'] = np.std(data_series)
-    data_stats['skew'] = stats.skew(data_series)
-    data_stats['kurtosis'] = stats.kurtosis(data_series)
-    data_stats['top_values'] = data_series[-top_values : ]
-
-    percentiles_to_measure = set([5, 10, 25, 50, 75, 90, 95]) | set(include_percentiles)
-    percentiles = cls.get_percentiles(data_series, percentiles_to_measure)
-
-    data_stats['percentiles'] = {}
-    for p in percentiles:
-      data_stats['percentiles'][p] = percentiles[p]
-    data_stats['middle_50'] = tuple([percentiles[25], percentiles[75]])
-    data_stats['middle_80'] = tuple([percentiles[10], percentiles[90]])
-    data_stats['middle_90'] = tuple([percentiles[5], percentiles[95]])
-
-    return data_stats
-
