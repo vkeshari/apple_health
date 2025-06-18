@@ -75,7 +75,7 @@ class AggregationPeriod(Enum):
 
 class AggregatorParams:
   # These are used only to decide what input file to read
-  FILENAME_SUFFIX =''
+  FILENAME_SUFFIX = ''
   START_DATE = date(2021, 1, 1)
   END_DATE = date(2025, 3, 1)
   PARSE_TIMEZONE = ParseTimezone.DATA_TIMEZONE
@@ -103,9 +103,9 @@ class RecordHistogramParams:
       HistogramParams('StepCount', 6000, 42000, 30, 0),
       HistogramParams('TimeInDaylight', 0, 360, 30, 0)]
       
-class AggregateGraphParams:
+class GraphParams:
   # These are used only to decide what input files to read
-  FILENAME_SUFFIX =''
+  FILENAME_SUFFIX = ''
   DATA_START_DATE = date(2021, 1, 1)
   DATA_END_DATE = date(2025, 3, 1)
   PARSE_TIMEZONE = ParseTimezone.DATA_TIMEZONE
@@ -119,3 +119,21 @@ class AggregateGraphParams:
 
   HISTOGRAMS = True
   LINE_GPAPHS = True
+
+class BucketingType(Enum):
+  RANDOMLY = 0
+  BY_YEAR = 1
+
+class BucketedGraphParams:
+  # These are used only to decide what input files to read
+  FILENAME_SUFFIX = ''
+  DATA_START_DATE = date(2021, 1, 1)
+  DATA_END_DATE = date(2025, 3, 1)
+  PARSE_TIMEZONE = ParseTimezone.DATA_TIMEZONE
+
+  GRAPH_START_DATE = date(2021, 1, 1)
+  GRAPH_END_DATE = date(2025, 1, 1)
+
+  AGGREGATION_PERIODS = [AggregationPeriod.DAILY,
+                          AggregationPeriod.WEEKLY]
+  BUCKETING = BucketingType.BY_YEAR

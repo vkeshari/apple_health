@@ -89,6 +89,14 @@ class DatetimeUtil:
     
     return cls.check_date_range(dt.date(), start_date, end_date)
 
+class Timestamp:
+
+  _timestamp_format = '%Y%m%d%H%M%S'
+
+  @classmethod
+  def get_timestamp(cls):
+    return datetime.now().strftime(cls._timestamp_format)
+
 
 class CalendarUtil:
 

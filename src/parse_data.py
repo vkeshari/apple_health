@@ -2,20 +2,9 @@ from datetime import datetime
 from xml.etree import ElementTree as ET
 
 import params as par
-from util import csvutil
-from util import dataio
+from util import csvutil, dataio, paramutil
 from util import xml_debug as xdb
 from util import xml_parse as xpr
-
-def validate_params():
-  if par.ParserParams.WRITE_DATA:
-    assert par.ParserParams.PARSE_DATA
-  
-  if par.ParserParams.OUT_FILENAME_SUFFIX:
-    assert par.ParserParams.OUT_FILENAME_SUFFIX[0] == '_'
-    assert not par.ParserParams.OUT_FILENAME_SUFFIX[-1] == '_'
-
-  assert par.ParserParams.END_DATE > par.ParserParams.START_DATE
 
 def process_xml(in_tree, start_date, end_date, parse_timezone,
                 show_summary = False, parse_data = True):
@@ -40,7 +29,7 @@ def process_xml(in_tree, start_date, end_date, parse_timezone,
 
 
 def parse_data():
-  validate_params()
+  paramutil.Validator.validate_parse_data()
 
   dio = dataio.DataIO()
   in_xml = dio.get_raw_xml_filepath(par.ParserParams.INPUT_FILENAME)

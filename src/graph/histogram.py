@@ -5,8 +5,7 @@ from matplotlib.patches import Rectangle
 
 import params as par
 from . import common
-from util import dataio
-from util import timeutil
+from util import dataio, paramutil, timeutil
 
 class Histogram:
   _resolution = tuple([7.2, 7.2])
@@ -15,17 +14,9 @@ class Histogram:
   _subfolder = Path('hist')
   _dio = dataio.DataIO()
 
-  _record_to_xmin = {}
-  _record_to_xmax = {}
-  _record_to_num_bins = {}
-  _record_to_text_precision = {}
-  for rhp in par.RecordHistogramParams.RECORD_HISTOGRAM_PARAMS:
-    record_type = rhp.record
-    _record_to_xmin[record_type] = rhp.xmin
-    _record_to_xmax[record_type] = rhp.xmax
-    assert rhp.num_bins % _major_x_ticks_spacing == 0
-    _record_to_num_bins[record_type] = rhp.num_bins
-    _record_to_text_precision[record_type] = rhp.text_precision
+  _record_to_xmin, _record_to_xmax, _record_to_num_bins = \
+      paramutil.RecordHistogramProperties.get_x_bounds(_major_x_ticks_spacing)
+  _record_to_text_precision = paramutil.RecordHistogramProperties.get_text_precision()
 
   def __init__(self, record_type, record_units, record_aggregation_type,
                 start_date, end_date, period):
@@ -56,14 +47,6 @@ class Histogram:
   def get_ylim(self, data_series):
     data_hist_vals, _ = np.histogram(data_series, bins = self.get_hist_bins())
     return int(max(data_hist_vals) * 1.25)
-
-  def get_top_values_count(self):
-    if self.period == par.AggregationPeriod.DAILY:
-      return 10
-    elif self.period == par.AggregationPeriod.WEEKLY:
-      return 5
-    elif self.period == par.AggregationPeriod.MONTHLY:
-      return 3
   
   def init_plot(self, title_text, ylim):
     self.ax.set_title(title_text)
@@ -109,8 +92,9 @@ class Histogram:
     xlim = self.get_xmax()
     stat_precision = self.get_text_precision()
 
-    data_stats = common.DataMetrics.get_stats(data_series, include_percentiles = percentiles,
-                                              top_values = self.get_top_values_count())
+    data_stats = common.DataMetrics.get_stats(
+        data_series, include_percentiles = percentiles,
+        top_values = common.DataMetrics.get_top_values_count(self.period))
     (mid50_low, mid50_high) = data_stats['middle_50']
     (mid80_low, mid80_high) = data_stats['middle_80']
     (mid90_low, mid90_high) = data_stats['middle_90']
@@ -176,7 +160,7 @@ class Histogram:
                                   .format(v1 = mid90_low, v2 = mid90_high))
     
     if show_top_values:
-      top_values_count = self.get_top_values_count()
+      top_values_count = common.DataMetrics.get_top_values_count(self.period)
       gmtp.newline()
       gmtp.plot_annotation(s = "Top {} values".format(top_values_count))
       
@@ -198,7 +182,7 @@ class Histogram:
 
 class SingleSeriesHistogram(Histogram):
 
-  _subfolder = Histogram._subfolder / 'singleseries' / common.Timestamp.get_timestamp()
+  _subfolder = Histogram._subfolder / 'singleseries' / timeutil.Timestamp.get_timestamp()
   _percentiles = [50, 75, 90, 95]
 
   def __init__(self, data, record_type, record_units, record_aggregation_type,
@@ -241,7 +225,7 @@ class SingleSeriesHistogram(Histogram):
 
 class MultiSeriesHistogram(Histogram):
 
-  _subfolder = Histogram._subfolder / 'multiseries' / common.Timestamp.get_timestamp()
+  _subfolder = Histogram._subfolder / 'multiseries' / timeutil.Timestamp.get_timestamp()
   _percentiles = []
 
   def __init__(self, split_name, datasets, record_type, record_units, record_aggregation_type,

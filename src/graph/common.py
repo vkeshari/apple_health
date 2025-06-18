@@ -1,18 +1,8 @@
 import numpy as np
-from datetime import datetime
 from matplotlib import pyplot as plt
 from scipy import stats
 
 import params as par
-
-class Timestamp:
-
-  _timestamp_format = '%Y%m%d%H%M%S'
-
-  @classmethod
-  def get_timestamp(cls):
-    return datetime.now().strftime(cls._timestamp_format)
-
 
 class DataMetrics:
 
@@ -64,6 +54,15 @@ class DataMetrics:
     data_stats['middle_90'] = tuple([percentiles[5], percentiles[95]])
 
     return data_stats
+
+  @classmethod
+  def get_top_values_count(cls, period):
+    if period == par.AggregationPeriod.DAILY:
+      return 10
+    elif period == par.AggregationPeriod.WEEKLY:
+      return 5
+    elif period == par.AggregationPeriod.MONTHLY:
+      return 3
 
 
 class GraphText:

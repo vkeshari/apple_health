@@ -2,18 +2,7 @@ from datetime import datetime
 import numpy as np
 
 import params as par
-from util import csvutil
-from util import dataio
-from util import timeutil
-
-def validate_params():
-  if par.AggregatorParams.FILENAME_SUFFIX:
-    assert par.AggregatorParams.FILENAME_SUFFIX[0] == '_'
-    assert not par.AggregatorParams.FILENAME_SUFFIX[-1] == '_'
-  
-  assert par.AggregationPeriod.DAILY not in par.AggregatorParams.AGGREGATION_PERIODS
-
-  assert par.AggregatorParams.END_DATE > par.AggregatorParams.START_DATE
+from util import csvutil, dataio, paramutil, timeutil
 
 def aggregate_data_by_period(daily_data_dict, period):
   start_time = datetime.now()
@@ -40,7 +29,7 @@ def aggregate_data_by_period(daily_data_dict, period):
 
 
 def aggregate_data():
-  validate_params()
+  paramutil.Validator.validate_aggregate_data()
 
   start_time = datetime.now()
   
