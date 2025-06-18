@@ -68,6 +68,14 @@ class DataMetrics:
 class GraphText:
 
   @classmethod
+  def pretty_enum(cls, enum_val, capitalize = False):
+    enum_name = enum_val.name.replace('_', ' ').lower()
+    if capitalize:
+      return enum_name.capitalize()
+    else:
+      return enum_name
+
+  @classmethod
   def get_period_text(cls, period):
     if period == par.AggregationPeriod.DAILY:
       return "Days"
@@ -87,17 +95,17 @@ class GraphText:
 
   @classmethod
   def get_graph_title(cls, record_type, record_unit, start_date, end_date,
-                      record_aggregation_type, period, bucketing_name = ''):
+                      record_aggregation_type, period, bucketing = None):
     record_aggregation_text = cls.get_aggregation_type_text(record_aggregation_type)
     title_text_1 = "{} ({})".format(record_type, record_unit)
     if period == par.AggregationPeriod.DAILY:
       title_text_2 = "Daily {}".format(record_aggregation_text)
     elif period in [par.AggregationPeriod.WEEKLY, par.AggregationPeriod.MONTHLY]:
-      title_text_2 = "{} Averages of Daily {}".format(period.name.capitalize(),
+      title_text_2 = "{} Averages of Daily {}".format(cls.pretty_enum(period, capitalize = True),
                                                       record_aggregation_text)
     title_text_3 = "{} to {}".format(start_date, end_date)
-    if bucketing_name:
-      title_text_3 += " (split {})".format(bucketing_name)
+    if bucketing:
+      title_text_3 += " (split {})".format(cls.pretty_enum(bucketing))
     return "{}: {}\n{}".format(title_text_1, title_text_2, title_text_3)
   
   @classmethod

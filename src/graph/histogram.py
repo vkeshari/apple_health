@@ -232,11 +232,11 @@ class MultiSeriesHistogram(Histogram):
   _percentiles = []
   _colors = list(mcolors.TABLEAU_COLORS.values())
 
-  def __init__(self, bucketing_name, datasets, record_type, record_units, record_aggregation_type,
+  def __init__(self, bucketing, datasets, record_type, record_units, record_aggregation_type,
                 start_date, end_date, period):
     Histogram.__init__(self, record_type, record_units, record_aggregation_type,
                         start_date, end_date, period)
-    self.bucketing_name = bucketing_name
+    self.bucketing = bucketing
     self.labels = list(datasets.keys())
     self.data_series = [sorted(datasets[l].values()) for l in self.labels]
     self.ylim = max([self.get_ylim(ds) for ds in self.data_series])
@@ -252,7 +252,7 @@ class MultiSeriesHistogram(Histogram):
     title_text = common.GraphText.get_graph_title(self.record_type, self.record_units,
                                                   self.start_date, self.end_date,
                                                   self.record_aggregation_type, self.period,
-                                                  self.bucketing_name)
+                                                  self.bucketing)
     Histogram.init_plot(self, title_text, self.ylim)
 
   def plot(self, show = False, save = False):
@@ -268,7 +268,7 @@ class MultiSeriesHistogram(Histogram):
     self.ax.legend(handles = hists, labels = self.labels, loc = 'upper right')
     
     if save:
-      save_filename = "{}_{}_{}_{}_{}.png".format(self.bucketing_name,
+      save_filename = "{}_{}_{}_{}_{}.png".format(self.bucketing.name,
                                                   self.record_type, self.period.name,
                                                   self.start_date.strftime("%Y%m%d"),
                                                   self.end_date.strftime("%Y%m%d"))

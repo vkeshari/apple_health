@@ -1,6 +1,33 @@
+import numpy as np
+
 import params as par
 from graph import histogram
 from util import csvutil, dataio, paramutil, timeutil
+
+def bucket_by_year(r_by_date):
+  r_by_sorted_date = {d: v for (d, v) in sorted(r_by_date.items())}
+  datasets = {}
+  for d in r_by_sorted_date:
+    y = d.year
+    if y not in datasets:
+      datasets[y] = {}
+    datasets[y][d] = r_by_sorted_date[d]
+  
+  return datasets
+
+def bucket_randomly(r_by_date, num_buckets):
+  dates = np.array(list(r_by_date.keys()))
+  np.random.shuffle(dates)
+  date_subsets = np.array_split(dates, num_buckets)
+  assert len(date_subsets) == num_buckets
+
+  datasets = {}
+  for i, ds in enumerate(date_subsets):
+    label = 'Random Dates {}'.format(i + 1)
+    r_by_date_subset = {d: v for (d, v) in r_by_date.items() if d in ds}
+    datasets[label] = {d: v for (d, v) in sorted(r_by_date_subset.items())}
+
+  return datasets
 
 def build_period_bucket_graphs(data_dict, record_aggregation_types, record_units,
                                 start_date, end_date, period, bucketing):
@@ -15,21 +42,15 @@ def build_period_bucket_graphs(data_dict, record_aggregation_types, record_units
         continue
       if not data_dict[d][r] == 0:
         r_by_date[d] = data_dict[d][r]
-    r_by_sorted_date = {d: v for (d, v) in sorted(r_by_date.items())}
 
     if bucketing == par.BucketingType.BY_YEAR:
-      datasets = {}
-      for d in r_by_sorted_date:
-        y = d.year
-        if y not in datasets:
-          datasets[y] = {}
-        datasets[y][d] = r_by_sorted_date[d]
+      datasets = bucket_by_year(r_by_date)
     elif bucketing == par.BucketingType.RANDOMLY:
-      datasets = {'SET 1': r_by_sorted_date}
-
+      datasets = bucket_randomly(r_by_date, num_buckets = 4)
+    
     if par.GraphParams.HISTOGRAMS and record_aggregation_types[r] == par.AggregateType.SUM:
       hist = histogram.MultiSeriesHistogram(
-                bucketing_name = bucketing.name,
+                bucketing = bucketing,
                 datasets = datasets,
                 record_type = r,
                 record_units = record_units[r],

@@ -102,7 +102,7 @@ class RecordHistogramParams:
       HistogramParams('FlightsClimbed', 0, 90, 30, 0),
       HistogramParams('StepCount', 6000, 42000, 30, 0),
       HistogramParams('TimeInDaylight', 0, 360, 30, 0)]
-      
+
 class GraphParams:
   # These are used only to decide what input files to read
   FILENAME_SUFFIX = ''
