@@ -14,6 +14,7 @@ class LineGraph:
   _subfolder = Path('line') / timeutil.Timestamp.get_timestamp()
   _dio = dataio.DataIO(par.DataParams)
   _record_to_text_precision = paramutil.RecordHistogramProperties.get_text_precision()
+  _record_to_ymin, _record_to_ymax = paramutil.RecordLineGraphProperties.get_y_bounds()
 
   _largest_periods = [par.AggregationPeriod.QUARTERLY,
                       par.AggregationPeriod.MONTHLY,
@@ -24,6 +25,10 @@ class LineGraph:
   _show_lines = par.AggregationPeriod.MONTHLY
   _show_intervals = par.AggregationPeriod.QUARTERLY
   _interval_percentiles = [[25, 75], [10, 90], [5, 95]]
+
+  @classmethod
+  def get_ybounds(cls, r):
+    return cls._record_to_ymin[r], cls._record_to_ymax[r]
   
   @classmethod
   def get_largest_period(cls, periods):
@@ -58,7 +63,6 @@ class LineGraph:
     self.end_date = timeutil.CalendarUtil.get_next_period_start_date(actual_end_date,
                                                                       self.largest_period)
 
-    self.ylim = math.ceil(np.average(self.data_series[self.smallest_period]) * 2)
     self.fig, self.ax = plt.subplots(figsize = self._resolution)
 
     self.init_plot()
@@ -75,8 +79,9 @@ class LineGraph:
     self.ax.set_xlim(self.start_date, self.end_date)
     self.ax.grid(True, which = 'major', axis = 'x', alpha = 0.5)
 
-    self.ax.set_ylim(0, self.ylim)
-    yticks_major, yticks_minor = common.GraphTickSpacer.get_ticks(0, self.ylim)
+    ymin, ymax = self.get_ybounds(self.record_type)
+    self.ax.set_ylim(ymin, ymax)
+    yticks_major, yticks_minor = common.GraphTickSpacer.get_ticks(ymin, ymax)
     self.ax.set_yticks(yticks_major)
     self.ax.set_yticks(yticks_minor, minor = True)
     self.ax.grid(True, which = 'minor', axis = 'y', alpha = 0.3)
@@ -146,12 +151,12 @@ class LineGraph:
                       color = 'tab:blue', alpha = 0.9, antialiased = True)
         all_handles.append(p[0])
         labels.append("{} Averages".format(common.GraphText.pretty_enum(period, capitalize = True)))
-      
+    
     if interval_handles:
       all_handles.append(interval_handles[0])
       labels.append("{} Intervals".format(common.GraphText.pretty_enum(self._show_intervals,
                                                                       capitalize = True)))
-      
+    
     self.ax.legend(handles = all_handles, labels = labels, loc = 'upper right')
 
     if save:

@@ -155,10 +155,10 @@ class RecordGraphTextParams:
 
 @dataclass
 class HistogramParams:
-  record:         str
-  xmin:           int
-  xmax:           int
-  num_bins:       int
+  record:   str
+  xmin:     int
+  xmax:     int
+  num_bins: int
 
 class RecordHistogramParams:
   RECORD_HISTOGRAM_PARAMS = [
@@ -169,3 +169,31 @@ class RecordHistogramParams:
       HistogramParams('FlightsClimbed', 0, 90, 30),
       HistogramParams('StepCount', 6000, 42000, 30),
       HistogramParams('TimeInDaylight', 0, 360, 30)]
+
+@dataclass
+class LineGraphParams:
+  record: str
+  ymin:   int
+  ymax:   int
+
+class RecordLineGraphParams:
+  RECORD_LINE_GRAPH_PARAMS = [
+      LineGraphParams('ActiveEnergyBurned', 0, 2500),
+      LineGraphParams('AppleExerciseTime', 0, 300),
+      LineGraphParams('AppleStandTime', 0, 500),
+      LineGraphParams('BodyMass', 70, 100),
+      LineGraphParams('DistanceWalkingRunning', 0, 25),
+      LineGraphParams('FlightsClimbed', 0, 100),
+      LineGraphParams('HeartRate', 40, 200),
+      LineGraphParams('HeartRateRecoveryOneMinute', 20, 60),
+      LineGraphParams('PhysicalEffort', 2, 6),
+      LineGraphParams('RespiratoryRate', 5, 25),
+      LineGraphParams('RestingHeartRate', 20, 80),
+      LineGraphParams('StairAscentSpeed', 0, 1),
+      LineGraphParams('StairDescentSpeed', 0, 1),
+      LineGraphParams('StepCount', 0, 30000),
+      LineGraphParams('TimeInDaylight', 0, 300),
+      LineGraphParams('VO2Max', 30, 50),
+      LineGraphParams('WalkingAsymmetryPercentage', 0, 100),
+      LineGraphParams('WalkingDoubleSupportPercentage', 20, 40),
+      LineGraphParams('WalkingSpeed', 2, 8)]

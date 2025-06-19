@@ -47,6 +47,8 @@ def build_line_graphs(data_dicts, record_aggregation_types, record_units, start_
           continue
         if not data_dict[d][r] == 0:
           r_by_date[d] = data_dict[d][r]
+          if record_units[r] == '%':
+            r_by_date[d] *= 100.0
       period_datasets[period] = {d: v for (d, v) in sorted(r_by_date.items())}
 
     if par.GraphParams.LINE_GRAPHS:

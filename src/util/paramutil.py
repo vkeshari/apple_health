@@ -100,3 +100,16 @@ class RecordHistogramProperties:
 
     return record_to_text_precision
 
+
+class RecordLineGraphProperties:
+
+  @classmethod
+  def get_y_bounds(cls):
+    record_to_ymin = {}
+    record_to_ymax = {}
+    for rlgp in par.RecordLineGraphParams.RECORD_LINE_GRAPH_PARAMS:
+      record_type = rlgp.record
+      record_to_ymin[record_type] = rlgp.ymin
+      record_to_ymax[record_type] = rlgp.ymax
+    
+    return record_to_ymin, record_to_ymax
