@@ -118,8 +118,8 @@ class GraphParams:
                           AggregationPeriod.MONTHLY,
                           AggregationPeriod.QUARTERLY]
 
-  HISTOGRAMS = True
-  LINE_GPAPHS = True
+  HISTOGRAMS = False
+  LINE_GRAPHS = True
 
 class BucketingType(Enum):
   RANDOMLY = 0

@@ -34,7 +34,7 @@ def build_bucket_tuning_data(data_dict, record_aggregation_types, record_units, 
     for num_buckets in bucket_range:
       datasets[num_buckets] = bucket_randomly(r_by_date.values(), num_buckets = num_buckets)
     
-    tuning_graph = tuning.TuningGraph(r, datasets,
+    tuning_graph = tuning.TuningGraph(datasets, r,
                                       record_units[r], record_aggregation_types[r],
                                       data_points = len(r_by_date))
     tuning_graph.plot(show = False, save = True)

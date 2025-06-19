@@ -33,6 +33,7 @@ def build_period_bucket_graphs(data_dict, record_aggregation_types, record_units
                                 start_date, end_date, period, bucketing):
   assert not record_aggregation_types.keys() ^ record_units.keys()
 
+  print()
   for r in record_aggregation_types:
     r_by_date = {}
     for d in data_dict:

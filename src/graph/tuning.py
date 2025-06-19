@@ -12,7 +12,7 @@ class TuningGraph:
   _subfolder = Path('tuning') / timeutil.Timestamp.get_timestamp()
   _dio = dataio.DataIO(par.DataParams)
 
-  def __init__(self, record_type, datasets, record_units, record_aggregation_type, data_points):
+  def __init__(self, datasets, record_type, record_units, record_aggregation_type, data_points):
     self.record_type = record_type
     self.record_units = record_units
     self.record_aggregation_type = record_aggregation_type
@@ -28,7 +28,9 @@ class TuningGraph:
     self.p5s = {b: np.percentile(datasets[b], 5, method = 'nearest') for b in self.buckets}
     self.p95s = {b: np.percentile(datasets[b], 95, method = 'nearest') for b in self.buckets}
 
+    self.ylim = round(np.average(list(self.averages.values())) * 2)
     self.fig, self.ax = plt.subplots(figsize = self._resolution)
+
     self.init_plot()
   
   def init_plot(self):
@@ -50,7 +52,6 @@ class TuningGraph:
     self.ax.grid(True, which = 'minor', axis = 'x', alpha = 0.3)
     self.ax.grid(True, which = 'major', axis = 'x', alpha = 0.5)
 
-    self.ylim = round(np.average(list(self.averages.values())) * 2)
     self.ax.set_ylim(0, self.ylim)
     yticks_major, yticks_minor = common.GraphTickSpacer.get_ticks(0, self.ylim)
     self.ax.set_yticks(yticks_major)
@@ -117,7 +118,6 @@ class TuningGraph:
     self.ax.legend(handles = [pts[0]] + all_error_bars[-2 : ],
                     labels = ['Avg of Avgs', 'Std Dev', 'Middle 90%'],
                     loc = 'lower right')
-
 
     if save:
       save_filename = "TUNING_{}_{}_{}.png".format(self.min_buckets, self.max_buckets,
