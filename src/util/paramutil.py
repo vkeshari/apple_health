@@ -37,12 +37,15 @@ class Validator:
   def validate_bucketed_graphs(cls):
     cls.validate_filename_suffix_format(par.BucketedGraphParams.FILENAME_SUFFIX)
 
-    assert par.GraphParams.DATA_END_DATE >= \
-              par.GraphParams.GRAPH_END_DATE > \
-              par.GraphParams.GRAPH_START_DATE >= \
-              par.GraphParams.DATA_START_DATE
+    assert par.BucketedGraphParams.DATA_END_DATE >= \
+              par.BucketedGraphParams.GRAPH_END_DATE > \
+              par.BucketedGraphParams.GRAPH_START_DATE >= \
+              par.BucketedGraphParams.DATA_START_DATE
     
     assert par.AggregationPeriod.MONTHLY not in par.BucketedGraphParams.AGGREGATION_PERIODS
+
+    if par.BucketedGraphParams.BUCKETING == par.BucketingType.RANDOMLY:
+      assert 10 >= par.BucketedGraphParams.NUM_RANDOM_BUCKETS > 1
 
 
 class RecordProperties:

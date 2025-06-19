@@ -136,4 +136,5 @@ class BucketedGraphParams:
 
   AGGREGATION_PERIODS = [AggregationPeriod.DAILY,
                           AggregationPeriod.WEEKLY]
-  BUCKETING = BucketingType.BY_YEAR
+  BUCKETING = BucketingType.RANDOMLY
+  NUM_RANDOM_BUCKETS = 10

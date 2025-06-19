@@ -230,7 +230,7 @@ class MultiSeriesHistogram(Histogram):
 
   _subfolder = Histogram._subfolder / 'multiseries' / timeutil.Timestamp.get_timestamp()
   _percentiles = []
-  _colors = list(mcolors.TABLEAU_COLORS.values())
+  _colors = list(mcolors.TABLEAU_COLORS.keys())
 
   def __init__(self, bucketing, datasets, record_type, record_units, record_aggregation_type,
                 start_date, end_date, period):
@@ -268,7 +268,7 @@ class MultiSeriesHistogram(Histogram):
     self.ax.legend(handles = hists, labels = self.labels, loc = 'upper right')
     
     if save:
-      save_filename = "{}_{}_{}_{}_{}.png".format(self.bucketing.name,
+      save_filename = "{}_{}_{}_{}_{}_{}.png".format(self.bucketing.name, len(self.data_series),
                                                   self.record_type, self.period.name,
                                                   self.start_date.strftime("%Y%m%d"),
                                                   self.end_date.strftime("%Y%m%d"))

@@ -46,9 +46,10 @@ def build_period_bucket_graphs(data_dict, record_aggregation_types, record_units
     if bucketing == par.BucketingType.BY_YEAR:
       datasets = bucket_by_year(r_by_date)
     elif bucketing == par.BucketingType.RANDOMLY:
-      datasets = bucket_randomly(r_by_date, num_buckets = 4)
+      datasets = bucket_randomly(r_by_date,
+                                  num_buckets = par.BucketedGraphParams.NUM_RANDOM_BUCKETS)
     
-    if par.GraphParams.HISTOGRAMS and record_aggregation_types[r] == par.AggregateType.SUM:
+    if record_aggregation_types[r] == par.AggregateType.SUM:
       hist = histogram.MultiSeriesHistogram(
                 bucketing = bucketing,
                 datasets = datasets,
