@@ -81,11 +81,13 @@ class AggregationPeriod(Enum):
   DAILY = 0
   WEEKLY = 1
   MONTHLY = 2
+  QUARTERLY = 3
 
 class AggregatorParams:
   # Does not support DAILY, by definition
   AGGREGATION_PERIODS = [AggregationPeriod.WEEKLY,
-                        AggregationPeriod.MONTHLY]
+                        AggregationPeriod.MONTHLY,
+                        AggregationPeriod.QUARTERLY]
   
   WRITE_DATA = True
 
@@ -113,7 +115,8 @@ class GraphParams:
 
   AGGREGATION_PERIODS = [AggregationPeriod.DAILY,
                           AggregationPeriod.WEEKLY,
-                          AggregationPeriod.MONTHLY]
+                          AggregationPeriod.MONTHLY,
+                          AggregationPeriod.QUARTERLY]
 
   HISTOGRAMS = True
   LINE_GPAPHS = True
@@ -126,7 +129,7 @@ class BucketedGraphParams:
   GRAPH_START_DATE = date(2021, 1, 1)
   GRAPH_END_DATE = date(2025, 1, 1)
 
-  # Does not support MONTHLY, due to small no. of data points
+  # Does not support MONTHLY or QUARTERLY, due to small no. of data points
   AGGREGATION_PERIODS = [AggregationPeriod.DAILY,
                           AggregationPeriod.WEEKLY]
   BUCKETING = BucketingType.RANDOMLY

@@ -63,6 +63,8 @@ class DataMetrics:
       return 5
     elif period == par.AggregationPeriod.MONTHLY:
       return 3
+    elif period == par.AggregationPeriod.QUARTERLY:
+      return 2
 
 
 class GraphText:
@@ -83,6 +85,8 @@ class GraphText:
       return "Weeks"
     elif period == par.AggregationPeriod.MONTHLY:
       return "Months"
+    elif period == par.AggregationPeriod.QUARTERLY:
+      return "Quarters"
 
   @classmethod
   def get_aggregation_type_text(cls, record_aggregation_type):
@@ -100,7 +104,9 @@ class GraphText:
     title_text_1 = "{} ({})".format(record_type, record_unit)
     if period == par.AggregationPeriod.DAILY:
       title_text_2 = "Daily {}".format(record_aggregation_text)
-    elif period in [par.AggregationPeriod.WEEKLY, par.AggregationPeriod.MONTHLY]:
+    elif period in [par.AggregationPeriod.WEEKLY,
+                    par.AggregationPeriod.MONTHLY,
+                    par.AggregationPeriod.QUARTERLY]:
       title_text_2 = "{} Averages of Daily {}".format(cls.pretty_enum(period, capitalize = True),
                                                       record_aggregation_text)
     title_text_3 = "{} to {}".format(start_date, end_date)

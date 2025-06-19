@@ -103,15 +103,26 @@ class CalendarUtil:
   _one_day = rd.relativedelta(days = 1)
   _one_week = rd.relativedelta(weeks = 1)
   _one_month = rd.relativedelta(months = 1)
-
-  @classmethod
-  def get_month_start_date(cls, d):
-    return date(d.year, d.month, 1)
+  _one_quarter = 3 * _one_month
+  _quarter_start_months = [1, 4, 7, 10]
   
   @classmethod
   def get_week_start_date(cls, d):
     day_of_week = d.weekday()
     return d - day_of_week * cls._one_day
+
+  @classmethod
+  def get_month_start_date(cls, d):
+    return date(d.year, d.month, 1)
+
+  @classmethod
+  def get_quarter_start_date(cls, d):
+    if d.month in cls._quarter_start_months:
+      return date(d.year, d.month, 1)
+    else:
+      for sm in cls._quarter_start_months:
+        if d.month - sm < 3:
+          return date(d.year, sm, 1)
   
   @classmethod
   def get_period_start_date(cls, d, period):
@@ -121,6 +132,8 @@ class CalendarUtil:
       return cls.get_week_start_date(d)
     elif period == par.AggregationPeriod.MONTHLY:
       return cls.get_month_start_date(d)
+    elif period == par.AggregationPeriod.QUARTERLY:
+      return cls.get_quarter_start_date(d)
   
   @classmethod
   def get_next_day(cls, d):
@@ -135,6 +148,10 @@ class CalendarUtil:
     return d + cls._one_month
   
   @classmethod
+  def get_next_quarter(cls, d):
+    return d + cls._one_quarter
+  
+  @classmethod
   def get_next_period(cls, d, period):
     if period == par.AggregationPeriod.DAILY:
       return cls.get_next_day(d)
@@ -142,6 +159,8 @@ class CalendarUtil:
       return cls.get_next_week(d)
     elif period == par.AggregationPeriod.MONTHLY:
       return cls.get_next_month(d)
+    elif period == par.AggregationPeriod.QUARTERLY:
+      return cls.get_next_quarter(d)
   
   @classmethod
   def get_next_period_start_date(cls, d, period):

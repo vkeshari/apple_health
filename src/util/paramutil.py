@@ -43,6 +43,7 @@ class Validator:
                               par.BucketedGraphParams.GRAPH_END_DATE)
     
     assert par.AggregationPeriod.MONTHLY not in par.BucketedGraphParams.AGGREGATION_PERIODS
+    assert par.AggregationPeriod.QUARTERLY not in par.BucketedGraphParams.AGGREGATION_PERIODS
     
     if par.BucketedGraphParams.BUCKETING == par.BucketingType.RANDOMLY:
       assert 1 < par.BucketedGraphParams.NUM_RANDOM_BUCKETS <= 10
