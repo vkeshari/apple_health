@@ -33,26 +33,15 @@ def aggregate_data():
 
   start_time = datetime.now()
   
-  dio = dataio.DataIO()
-  in_csv_filename = "{tz}_{start}_{end}{suffix}.csv".format(
-                        tz = par.AggregatorParams.PARSE_TIMEZONE.name,
-                        start = par.AggregatorParams.START_DATE.strftime("%Y%m%d"),
-                        end = par.AggregatorParams.END_DATE.strftime("%Y%m%d"),
-                        suffix = par.AggregatorParams.FILENAME_SUFFIX)
-  in_csv = dio.get_parsed_csv_filepath(in_csv_filename)
+  dio = dataio.DataIO(par.DataParams)
+  in_csv = dio.get_csv_file()
 
   daily_data_dict = csvutil.CsvIO.read_data_csv(in_csv)
 
   for period in par.AggregatorParams.AGGREGATION_PERIODS:
     aggregated_data_dict = aggregate_data_by_period(daily_data_dict, period)
     if par.AggregatorParams.WRITE_DATA:
-      aggregated_csv_filename = "{tz}_{start}_{end}{suffix}_{period}.csv".format(
-                                    tz = par.AggregatorParams.PARSE_TIMEZONE.name,
-                                    start = par.AggregatorParams.START_DATE.strftime("%Y%m%d"),
-                                    end = par.AggregatorParams.END_DATE.strftime("%Y%m%d"),
-                                    suffix = par.AggregatorParams.FILENAME_SUFFIX,
-                                    period = period.name)
-      aggregated_csv = dio.get_parsed_csv_filepath(aggregated_csv_filename)
+      aggregated_csv = dio.get_csv_file(period = period)
       csvutil.CsvIO.write_data_csv(aggregated_csv, aggregated_data_dict)
     
   print()

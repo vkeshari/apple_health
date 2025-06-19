@@ -9,43 +9,43 @@ class Validator:
       assert not suffix[-1] == '_'
   
   @classmethod
+  def validate_data_params(cls):
+    cls.validate_filename_suffix_format(par.DataParams.FILENAME_SUFFIX)
+    assert par.DataParams.END_DATE > par.DataParams.START_DATE
+  
+  @classmethod
+  def validate_graph_dates(cls, graph_start_date, graph_end_date):
+    assert graph_start_date >= par.DataParams.START_DATE
+    assert graph_end_date <= par.DataParams.END_DATE
+    assert graph_start_date < graph_end_date
+
+
+  @classmethod
   def validate_parse_data(cls):
     if par.ParserParams.WRITE_DATA:
       assert par.ParserParams.PARSE_DATA
+    cls.validate_data_params()
 
-    cls.validate_filename_suffix_format(par.ParserParams.OUT_FILENAME_SUFFIX)
-
-    assert par.ParserParams.END_DATE > par.ParserParams.START_DATE
-  
   @classmethod
   def validate_aggregate_data(cls):
-    cls.validate_filename_suffix_format(par.AggregatorParams.FILENAME_SUFFIX)
-
-    assert par.AggregatorParams.END_DATE > par.AggregatorParams.START_DATE
+    cls.validate_data_params()
     assert par.AggregationPeriod.DAILY not in par.AggregatorParams.AGGREGATION_PERIODS
 
   @classmethod
   def validate_build_graphs(cls):
-    cls.validate_filename_suffix_format(par.GraphParams.FILENAME_SUFFIX)
-
-    assert par.GraphParams.DATA_END_DATE >= \
-              par.GraphParams.GRAPH_END_DATE > \
-              par.GraphParams.GRAPH_START_DATE >= \
-              par.GraphParams.DATA_START_DATE
+    cls.validate_data_params()
+    cls.validate_graph_dates(par.GraphParams.GRAPH_START_DATE, par.GraphParams.GRAPH_END_DATE)
 
   @classmethod
   def validate_bucketed_graphs(cls):
-    cls.validate_filename_suffix_format(par.BucketedGraphParams.FILENAME_SUFFIX)
-
-    assert par.BucketedGraphParams.DATA_END_DATE >= \
-              par.BucketedGraphParams.GRAPH_END_DATE > \
-              par.BucketedGraphParams.GRAPH_START_DATE >= \
-              par.BucketedGraphParams.DATA_START_DATE
+    cls.validate_data_params()
+    cls.validate_graph_dates(par.BucketedGraphParams.GRAPH_START_DATE,
+                              par.BucketedGraphParams.GRAPH_END_DATE)
     
     assert par.AggregationPeriod.MONTHLY not in par.BucketedGraphParams.AGGREGATION_PERIODS
-
+    
     if par.BucketedGraphParams.BUCKETING == par.BucketingType.RANDOMLY:
-      assert 10 >= par.BucketedGraphParams.NUM_RANDOM_BUCKETS > 1
+      assert 1 < par.BucketedGraphParams.NUM_RANDOM_BUCKETS <= 10
 
 
 class RecordProperties:

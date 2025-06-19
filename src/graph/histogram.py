@@ -13,7 +13,7 @@ class Histogram:
   _major_x_ticks_spacing = 5
   _text_spacing_factor = 0.03
   _subfolder = Path('hist')
-  _dio = dataio.DataIO()
+  _dio = dataio.DataIO(par.DataParams)
 
   _record_to_xmin, _record_to_xmax, _record_to_num_bins = \
       paramutil.RecordHistogramProperties.get_x_bounds(_major_x_ticks_spacing)

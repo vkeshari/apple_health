@@ -1,7 +1,9 @@
 from pathlib import Path
 
 class DataIO:
-  def __init__(self):
+  def __init__(self, data_params):
+    self.data_params = data_params
+
     current_dir = Path.cwd()
     assert current_dir.parts[-1] == 'apple_health', "Must run from folder apple_health"
 
@@ -22,3 +24,20 @@ class DataIO:
   
   def get_graph_filepath(self, filename):
     return self.graph_dir / filename
+
+  def get_csv_file(self, period = None):
+    if period:
+      csv_filename = "{tz}_{start}_{end}{suffix}_{period}.csv".format(
+                          tz = self.data_params.PARSE_TIMEZONE.name,
+                          start = self.data_params.START_DATE.strftime("%Y%m%d"),
+                          end = self.data_params.END_DATE.strftime("%Y%m%d"),
+                          suffix = self.data_params.FILENAME_SUFFIX,
+                          period = period.name)
+    else:
+      csv_filename = "{tz}_{start}_{end}{suffix}.csv".format(
+                          tz = self.data_params.PARSE_TIMEZONE.name,
+                          start = self.data_params.START_DATE.strftime("%Y%m%d"),
+                          end = self.data_params.END_DATE.strftime("%Y%m%d"),
+                          suffix = self.data_params.FILENAME_SUFFIX)
+
+    return self.get_parsed_csv_filepath(csv_filename)

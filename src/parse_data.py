@@ -31,7 +31,7 @@ def process_xml(in_tree, start_date, end_date, parse_timezone,
 def parse_data():
   paramutil.Validator.validate_parse_data()
 
-  dio = dataio.DataIO()
+  dio = dataio.DataIO(par.DataParams)
   in_xml = dio.get_raw_xml_filepath(par.ParserParams.INPUT_FILENAME)
   print("IN:\t{}".format(in_xml))
 
@@ -42,18 +42,13 @@ def parse_data():
   print("Input read in {}".format(datetime.now() - start_time))
 
   data_dict = process_xml(in_tree,
-                            start_date = par.ParserParams.START_DATE,
-                            end_date = par.ParserParams.END_DATE,
-                            parse_timezone = par.ParserParams.PARSE_TIMEZONE,
+                            start_date = par.DataParams.START_DATE,
+                            end_date = par.DataParams.END_DATE,
+                            parse_timezone = par.DataParams.PARSE_TIMEZONE,
                             show_summary = par.ParserParams.SHOW_SUMMARY,
                             parse_data = par.ParserParams.PARSE_DATA)
   if par.ParserParams.WRITE_DATA:
-    out_csv_filename = "{tz}_{start}_{end}{suffix}.csv".format(
-                          tz = par.ParserParams.PARSE_TIMEZONE.name,
-                          start = par.ParserParams.START_DATE.strftime("%Y%m%d"),
-                          end = par.ParserParams.END_DATE.strftime("%Y%m%d"),
-                          suffix = par.ParserParams.OUT_FILENAME_SUFFIX)
-    out_csv = dio.get_parsed_csv_filepath(out_csv_filename)
+    out_csv = dio.get_csv_file()
     csvutil.CsvIO.write_data_csv(out_csv, data_dict)
 
   print()

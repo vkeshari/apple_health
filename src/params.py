@@ -36,18 +36,27 @@ class RecordParams:
                   RecordType('WalkingSpeed', 'km/hr', AggregateType.MEDIAN)]
 
 class ParseTimezone(Enum):
+  # Parse all data in current timezone
+  #   (this is the timezone in which Apple Health Data was exported)
   CURRENT_TIMEZONE = 0
+
+  # Parse all data in the best estimate of the data's timezone
+  #   (as defined in util.timeutil.TimezoneHistory)
   DATA_TIMEZONE = 1
 
-class ParserParams:
-  INPUT_FILENAME = '20250530.xml'
-
-  OUT_FILENAME_SUFFIX = ''
+class DataParams:
+  # These are used to decide what input CSV file(s) to read or write
+  FILENAME_SUFFIX = ''
   START_DATE = date(2021, 1, 1)
   END_DATE = date(2025, 3, 1)
   PARSE_TIMEZONE = ParseTimezone.DATA_TIMEZONE
 
+class ParserParams:
+  INPUT_FILENAME = '20250530.xml'
+
+  # Configure summary in XmlDebugParams
   SHOW_SUMMARY = False
+
   PARSE_DATA = True
   WRITE_DATA = True
 
@@ -65,8 +74,8 @@ class XmlDebugParams:
   SHOW_ORPHANED_RECORDS = False
   SHOW_ORPHANED_DATES = False
 
-  SHOW_RECORD_UNIT_COUNTS = False
-  SHOW_RECORD_SOURCE_COUNTS = True
+  SHOW_RECORD_UNIT_COUNTS = True
+  SHOW_RECORD_SOURCE_COUNTS = False
 
 class AggregationPeriod(Enum):
   DAILY = 0
@@ -74,12 +83,7 @@ class AggregationPeriod(Enum):
   MONTHLY = 2
 
 class AggregatorParams:
-  # These are used only to decide what input file to read
-  FILENAME_SUFFIX = ''
-  START_DATE = date(2021, 1, 1)
-  END_DATE = date(2025, 3, 1)
-  PARSE_TIMEZONE = ParseTimezone.DATA_TIMEZONE
-  
+  # Does not support DAILY, by definition
   AGGREGATION_PERIODS = [AggregationPeriod.WEEKLY,
                         AggregationPeriod.MONTHLY]
   
@@ -104,12 +108,6 @@ class RecordHistogramParams:
       HistogramParams('TimeInDaylight', 0, 360, 30, 0)]
 
 class GraphParams:
-  # These are used only to decide what input files to read
-  FILENAME_SUFFIX = ''
-  DATA_START_DATE = date(2021, 1, 1)
-  DATA_END_DATE = date(2025, 3, 1)
-  PARSE_TIMEZONE = ParseTimezone.DATA_TIMEZONE
-
   GRAPH_START_DATE = date(2021, 1, 1)
   GRAPH_END_DATE = date(2025, 3, 1)
 
@@ -125,15 +123,10 @@ class BucketingType(Enum):
   BY_YEAR = 1
 
 class BucketedGraphParams:
-  # These are used only to decide what input files to read
-  FILENAME_SUFFIX = ''
-  DATA_START_DATE = date(2021, 1, 1)
-  DATA_END_DATE = date(2025, 3, 1)
-  PARSE_TIMEZONE = ParseTimezone.DATA_TIMEZONE
-
   GRAPH_START_DATE = date(2021, 1, 1)
   GRAPH_END_DATE = date(2025, 1, 1)
 
+  # Does not support MONTHLY, due to small no. of data points
   AGGREGATION_PERIODS = [AggregationPeriod.DAILY,
                           AggregationPeriod.WEEKLY]
   BUCKETING = BucketingType.RANDOMLY

@@ -38,20 +38,13 @@ def build_graphs():
   record_aggregation_types = paramutil.RecordProperties.get_record_aggregation_types()
   record_units = paramutil.RecordProperties.get_record_units()
 
-  dio = dataio.DataIO()
+  dio = dataio.DataIO(par.DataParams)
   for period in par.GraphParams.AGGREGATION_PERIODS:
     if period == par.AggregationPeriod.DAILY:
-      period_text = ''
+      data_csv = dio.get_csv_file()
     else:
-      period_text = '_' + period.name
-  
-    data_csv_filename = "{tz}_{start}_{end}{suffix}{period}.csv".format(
-                            tz = par.GraphParams.PARSE_TIMEZONE.name,
-                            start = par.GraphParams.DATA_START_DATE.strftime("%Y%m%d"),
-                            end = par.GraphParams.DATA_END_DATE.strftime("%Y%m%d"),
-                            suffix = par.GraphParams.FILENAME_SUFFIX,
-                            period = period_text)
-    data_csv = dio.get_parsed_csv_filepath(data_csv_filename)
+      data_csv = dio.get_csv_file(period = period)
+
     data_dict = csvutil.CsvIO.read_data_csv(data_csv)
     build_period_graphs(data_dict, record_aggregation_types, record_units,
                         start_date = par.GraphParams.GRAPH_START_DATE,
