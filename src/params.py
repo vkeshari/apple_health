@@ -3,38 +3,6 @@ from enum import Enum
 
 from datetime import date
 
-class AggregateType(Enum):
-  SUM = 0
-  AVERAGE = 1
-  MEDIAN = 2
-
-@dataclass
-class RecordType:
-  record:      str
-  unit:        str
-  aggregation: AggregateType
-
-class RecordParams:
-  RECORD_TYPES = [RecordType('ActiveEnergyBurned', 'Cal', AggregateType.SUM),
-                  RecordType('AppleExerciseTime', 'min', AggregateType.SUM),
-                  RecordType('AppleStandTime', 'min', AggregateType.SUM),
-                  RecordType('BodyMass', 'kg', AggregateType.AVERAGE),
-                  RecordType('DistanceWalkingRunning', 'km', AggregateType.SUM),
-                  RecordType('FlightsClimbed', 'count', AggregateType.SUM),
-                  RecordType('HeartRate', 'count/min', AggregateType.MEDIAN),
-                  RecordType('HeartRateRecoveryOneMinute', 'count/min', AggregateType.MEDIAN),
-                  RecordType('PhysicalEffort', 'kcal/hr·kg', AggregateType.MEDIAN),
-                  RecordType('RespiratoryRate', 'count/min', AggregateType.MEDIAN),
-                  RecordType('RestingHeartRate', 'count/min', AggregateType.MEDIAN),
-                  RecordType('StairAscentSpeed', 'm/s', AggregateType.MEDIAN),
-                  RecordType('StairDescentSpeed', 'm/s', AggregateType.MEDIAN),
-                  RecordType('StepCount', 'count', AggregateType.SUM),
-                  RecordType('TimeInDaylight', 'min', AggregateType.SUM),
-                  RecordType('VO2Max', 'mL/min·kg', AggregateType.AVERAGE),
-                  RecordType('WalkingAsymmetryPercentage', '%', AggregateType.AVERAGE),
-                  RecordType('WalkingDoubleSupportPercentage', '%', AggregateType.AVERAGE),
-                  RecordType('WalkingSpeed', 'km/hr', AggregateType.MEDIAN)]
-
 class ParseTimezone(Enum):
   # Parse all data in current timezone
   #   (this is the timezone in which Apple Health Data was exported)
@@ -91,38 +59,6 @@ class AggregatorParams:
   
   WRITE_DATA = True
 
-@dataclass
-class GraphTextParams:
-  record:         str
-  text_precision: int
-
-class RecordGraphTextParams:
-  RECORD_GRAPH_TEXT_PARAMS = [
-      GraphTextParams('ActiveEnergyBurned', 0),
-      GraphTextParams('AppleExerciseTime', 0),
-      GraphTextParams('AppleStandTime', 0),
-      GraphTextParams('DistanceWalkingRunning', 1),
-      GraphTextParams('FlightsClimbed', 0),
-      GraphTextParams('StepCount', 0),
-      GraphTextParams('TimeInDaylight', 0)]
-
-@dataclass
-class HistogramParams:
-  record:         str
-  xmin:           int
-  xmax:           int
-  num_bins:       int
-
-class RecordHistogramParams:
-  RECORD_HISTOGRAM_PARAMS = [
-      HistogramParams('ActiveEnergyBurned', 600, 2400, 30),
-      HistogramParams('AppleExerciseTime', 30, 330, 30),
-      HistogramParams('AppleStandTime', 100, 550, 30),
-      HistogramParams('DistanceWalkingRunning', 5, 35, 30),
-      HistogramParams('FlightsClimbed', 0, 90, 30),
-      HistogramParams('StepCount', 6000, 42000, 30),
-      HistogramParams('TimeInDaylight', 0, 360, 30)]
-
 class GraphParams:
   GRAPH_START_DATE = date(2021, 1, 1)
   GRAPH_END_DATE = date(2025, 3, 1)
@@ -153,3 +89,83 @@ class BucketTuningParams:
   MIN_BUCKETS = 1
   MAX_BUCKETS = 60
   BUCKET_STEP = 1
+
+
+# Record and graph configs
+
+class AggregateType(Enum):
+  SUM = 0
+  AVERAGE = 1
+  MEDIAN = 2
+
+@dataclass
+class RecordType:
+  record:      str
+  unit:        str
+  aggregation: AggregateType
+
+class RecordParams:
+  RECORD_TYPES = [
+      RecordType('ActiveEnergyBurned', 'Cal', AggregateType.SUM),
+      RecordType('AppleExerciseTime', 'min', AggregateType.SUM),
+      RecordType('AppleStandTime', 'min', AggregateType.SUM),
+      RecordType('BodyMass', 'kg', AggregateType.AVERAGE),
+      RecordType('DistanceWalkingRunning', 'km', AggregateType.SUM),
+      RecordType('FlightsClimbed', 'count', AggregateType.SUM),
+      RecordType('HeartRate', 'count/min', AggregateType.MEDIAN),
+      RecordType('HeartRateRecoveryOneMinute', 'count/min', AggregateType.MEDIAN),
+      RecordType('PhysicalEffort', 'kcal/hr·kg', AggregateType.MEDIAN),
+      RecordType('RespiratoryRate', 'count/min', AggregateType.MEDIAN),
+      RecordType('RestingHeartRate', 'count/min', AggregateType.MEDIAN),
+      RecordType('StairAscentSpeed', 'm/s', AggregateType.MEDIAN),
+      RecordType('StairDescentSpeed', 'm/s', AggregateType.MEDIAN),
+      RecordType('StepCount', 'count', AggregateType.SUM),
+      RecordType('TimeInDaylight', 'min', AggregateType.SUM),
+      RecordType('VO2Max', 'mL/min·kg', AggregateType.AVERAGE),
+      RecordType('WalkingAsymmetryPercentage', '%', AggregateType.AVERAGE),
+      RecordType('WalkingDoubleSupportPercentage', '%', AggregateType.AVERAGE),
+      RecordType('WalkingSpeed', 'km/hr', AggregateType.MEDIAN)]
+
+@dataclass
+class GraphTextParams:
+  record:         str
+  text_precision: int
+
+class RecordGraphTextParams:
+  RECORD_GRAPH_TEXT_PARAMS = [
+      GraphTextParams('ActiveEnergyBurned', 0),
+      GraphTextParams('AppleExerciseTime', 0),
+      GraphTextParams('AppleStandTime', 0),
+      GraphTextParams('BodyMass', 1),
+      GraphTextParams('DistanceWalkingRunning', 1),
+      GraphTextParams('FlightsClimbed', 0),
+      GraphTextParams('HeartRate', 0),
+      GraphTextParams('HeartRateRecoveryOneMinute', 0),
+      GraphTextParams('PhysicalEffort', 1),
+      GraphTextParams('RespiratoryRate', 1),
+      GraphTextParams('RestingHeartRate', 0),
+      GraphTextParams('StairAscentSpeed', 1),
+      GraphTextParams('StairDescentSpeed', 1),
+      GraphTextParams('StepCount', 0),
+      GraphTextParams('TimeInDaylight', 0),
+      GraphTextParams('VO2Max', 1),
+      GraphTextParams('WalkingAsymmetryPercentage', 2),
+      GraphTextParams('WalkingDoubleSupportPercentage', 2),
+      GraphTextParams('WalkingSpeed', 1)]
+
+@dataclass
+class HistogramParams:
+  record:         str
+  xmin:           int
+  xmax:           int
+  num_bins:       int
+
+class RecordHistogramParams:
+  RECORD_HISTOGRAM_PARAMS = [
+      HistogramParams('ActiveEnergyBurned', 600, 2400, 30),
+      HistogramParams('AppleExerciseTime', 30, 330, 30),
+      HistogramParams('AppleStandTime', 100, 550, 30),
+      HistogramParams('DistanceWalkingRunning', 5, 35, 30),
+      HistogramParams('FlightsClimbed', 0, 90, 30),
+      HistogramParams('StepCount', 6000, 42000, 30),
+      HistogramParams('TimeInDaylight', 0, 360, 30)]

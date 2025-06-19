@@ -13,7 +13,7 @@ class LineGraph:
   _text_spacing_factor = 0.03
   _subfolder = Path('line') / timeutil.Timestamp.get_timestamp()
   _dio = dataio.DataIO(par.DataParams)
-  _record_to_text_precision = None
+  _record_to_text_precision = paramutil.RecordHistogramProperties.get_text_precision()
 
   _largest_periods = [par.AggregationPeriod.QUARTERLY,
                       par.AggregationPeriod.MONTHLY,
