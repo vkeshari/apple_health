@@ -85,9 +85,10 @@ class LineGraph:
   def get_text_precision(self):
     return self._record_to_text_precision[self.record_type]
 
-  def plot_interval(self, d, patch_width, low, high):
-    self.ax.add_patch(Rectangle((d, low), height = high - low, width = patch_width,
-                                facecolor = 'tab:blue', alpha = 0.3, fill = True))
+  def plot_interval(self, d, patch_width, low, high, interval_handles):
+    p = self.ax.add_patch(Rectangle((d, low), height = high - low, width = patch_width,
+                                    facecolor = 'tab:blue', alpha = 0.3, fill = True))
+    interval_handles.append(p)
 
   def show_or_save(self, show = False, save_filename = None):
     self.fig.tight_layout()
@@ -101,10 +102,16 @@ class LineGraph:
       plt.close()
   
   def plot(self, show = False, save = False):
+    
+    all_handles = []
+    interval_handles = []
+    labels = []
     for period in self.dates:
       if period == par.AggregationPeriod.DAILY:
-        plt.scatter(self.dates[period], self.data_series[period],
-                    s = 50, c = 'tab:gray', alpha = 0.1)
+        s = plt.scatter(self.dates[period], self.data_series[period],
+                        s = 50, c = 'tab:gray', alpha = 0.1)
+        all_handles.append(s)
+        labels.append('Daily Values')
         
         if self._show_intervals:
           interval_data = {}
@@ -122,17 +129,30 @@ class LineGraph:
                 common.DataMetrics.get_percentiles(interval_data[d],
                                                     percentiles = all_percentiles)
             for p_low, p_high in self._interval_percentiles:
-              self.plot_interval(d, patch_width, percentiles[p_low], percentiles[p_high])
+              self.plot_interval(d, patch_width,
+                                  percentiles[p_low], percentiles[p_high],
+                                  interval_handles)
       
       if self._show_lines and period == self._show_lines:
         xs = [timeutil.CalendarUtil.get_middle_of_period(d, period) for d in self.dates[period]]
-        plt.plot(xs, self.data_series[period],
-                  linewidth = 3, color = 'tab:blue', alpha = 0.8, antialiased = True)
+        l = plt.plot(xs, self.data_series[period],
+                      linewidth = 3, color = 'tab:blue', alpha = 0.8, antialiased = True)
+        all_handles.append(l[0])
+        labels.append("{} Averages".format(common.GraphText.pretty_enum(period, capitalize = True)))
       if self._show_points and period == self._show_points:
         xs = [timeutil.CalendarUtil.get_middle_of_period(d, period) for d in self.dates[period]]
-        plt.plot(xs, self.data_series[period],
-                  marker = "o", markersize = 10, linewidth = 0,
-                  color = 'tab:blue', alpha = 0.9, antialiased = True)
+        p = plt.plot(xs, self.data_series[period],
+                      marker = "o", markersize = 10, linewidth = 0,
+                      color = 'tab:blue', alpha = 0.9, antialiased = True)
+        all_handles.append(p[0])
+        labels.append("{} Averages".format(common.GraphText.pretty_enum(period, capitalize = True)))
+      
+    if interval_handles:
+      all_handles.append(interval_handles[0])
+      labels.append("{} Intervals".format(common.GraphText.pretty_enum(self._show_intervals,
+                                                                      capitalize = True)))
+      
+    self.ax.legend(handles = all_handles, labels = labels, loc = 'upper right')
 
     if save:
       save_filename = "{}_{}_{}.png".format(self.record_type,
