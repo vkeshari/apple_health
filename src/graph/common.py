@@ -185,8 +185,12 @@ class GraphTickSpacer:
   @classmethod
   def get_ticks(cls, lower, upper):
     difference = upper - lower
+    if difference <= 1:
+      return np.arange(lower, upper, 0.2), np.arange(lower, upper, 0.1)
+    if difference <= 5:
+      return list(range(lower, upper)), np.arange(lower, upper, 0.2)
     if difference <= 10:
-      return list(range(lower, upper)), []
+      return list(range(lower, upper)), np.arange(lower, upper, 0.5)
     elif difference <= 20:
       return list(range(lower, upper, 2)), list(range(lower, upper))
     elif difference <= 50:

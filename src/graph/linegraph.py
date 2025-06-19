@@ -20,7 +20,11 @@ class LineGraph:
                       par.AggregationPeriod.WEEKLY,
                       par.AggregationPeriod.DAILY]
   
-
+  _show_points = par.AggregationPeriod.QUARTERLY
+  _show_lines = par.AggregationPeriod.MONTHLY
+  _show_intervals = par.AggregationPeriod.QUARTERLY
+  _interval_percentiles = [[25, 75], [10, 90], [5, 95]]
+  
   @classmethod
   def get_largest_period(cls, periods):
     for p in cls._largest_periods:
@@ -81,6 +85,10 @@ class LineGraph:
   def get_text_precision(self):
     return self._record_to_text_precision[self.record_type]
 
+  def plot_interval(self, d, patch_width, low, high):
+    self.ax.add_patch(Rectangle((d, low), height = high - low, width = patch_width,
+                                facecolor = 'tab:blue', alpha = 0.3, fill = True))
+
   def show_or_save(self, show = False, save_filename = None):
     self.fig.tight_layout()
     if show:
@@ -93,6 +101,38 @@ class LineGraph:
       plt.close()
   
   def plot(self, show = False, save = False):
+    for period in self.dates:
+      if period == par.AggregationPeriod.DAILY:
+        plt.scatter(self.dates[period], self.data_series[period],
+                    s = 50, c = 'tab:gray', alpha = 0.1)
+        
+        if self._show_intervals:
+          interval_data = {}
+          for i, d in enumerate(self.dates[period]):
+            start_of_interval = timeutil.CalendarUtil.get_period_start_date(
+                                d, period = self._show_intervals)
+            if start_of_interval not in interval_data:
+              interval_data[start_of_interval] = []
+            interval_data[start_of_interval].append(self.data_series[period][i])
+          for d in interval_data:
+            patch_width = \
+                timeutil.CalendarUtil.get_next_period(d, period = self._show_intervals) - d
+            all_percentiles = np.array(self._interval_percentiles).flatten()
+            percentiles = \
+                common.DataMetrics.get_percentiles(interval_data[d],
+                                                    percentiles = all_percentiles)
+            for p_low, p_high in self._interval_percentiles:
+              self.plot_interval(d, patch_width, percentiles[p_low], percentiles[p_high])
+      
+      if self._show_lines and period == self._show_lines:
+        xs = [timeutil.CalendarUtil.get_middle_of_period(d, period) for d in self.dates[period]]
+        plt.plot(xs, self.data_series[period],
+                  linewidth = 3, color = 'tab:blue', alpha = 0.8, antialiased = True)
+      if self._show_points and period == self._show_points:
+        xs = [timeutil.CalendarUtil.get_middle_of_period(d, period) for d in self.dates[period]]
+        plt.plot(xs, self.data_series[period],
+                  marker = "o", markersize = 10, linewidth = 0,
+                  color = 'tab:blue', alpha = 0.9, antialiased = True)
 
     if save:
       save_filename = "{}_{}_{}.png".format(self.record_type,

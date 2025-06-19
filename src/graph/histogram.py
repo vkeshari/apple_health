@@ -219,7 +219,7 @@ class SingleSeriesHistogram(Histogram):
                     show_total_count = True, show_normal_stats = True, show_order_stats = True,
                     show_top_values = True, show_intervals = True)
     if save:
-      save_filename = "{}_{}_{}_{}.png".format(self.record_type, self.period.name,
+      save_filename = "{}_{}_{}_{}.png".format(self.period.name, self.record_type,
                                                 self.start_date.strftime("%Y%m%d"),
                                                 self.end_date.strftime("%Y%m%d"))
       self.show_or_save(show = show, save_filename = save_filename)

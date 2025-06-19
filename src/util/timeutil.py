@@ -165,3 +165,9 @@ class CalendarUtil:
   @classmethod
   def get_next_period_start_date(cls, d, period):
     return cls.get_next_period(cls.get_period_start_date(d, period), period)
+  
+  @classmethod
+  def get_middle_of_period(cls, d, period):
+    next_period = cls.get_next_period(d, period)
+    period_width = next_period - d
+    return d + period_width / 2
