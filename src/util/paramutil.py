@@ -94,7 +94,7 @@ class RecordHistogramProperties:
   @classmethod
   def get_text_precision(cls):
     record_to_text_precision = {}
-    for rhp in par.RecordHistogramParams.RECORD_HISTOGRAM_PARAMS:
+    for rhp in par.RecordGraphTextParams.RECORD_GRAPH_TEXT_PARAMS:
       record_type = rhp.record
       record_to_text_precision[record_type] = rhp.text_precision
 

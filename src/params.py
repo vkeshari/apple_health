@@ -92,22 +92,36 @@ class AggregatorParams:
   WRITE_DATA = True
 
 @dataclass
+class GraphTextParams:
+  record:         str
+  text_precision: int
+
+class RecordGraphTextParams:
+  RECORD_GRAPH_TEXT_PARAMS = [
+      GraphTextParams('ActiveEnergyBurned', 0),
+      GraphTextParams('AppleExerciseTime', 0),
+      GraphTextParams('AppleStandTime', 0),
+      GraphTextParams('DistanceWalkingRunning', 1),
+      GraphTextParams('FlightsClimbed', 0),
+      GraphTextParams('StepCount', 0),
+      GraphTextParams('TimeInDaylight', 0)]
+
+@dataclass
 class HistogramParams:
   record:         str
   xmin:           int
   xmax:           int
   num_bins:       int
-  text_precision: int
 
 class RecordHistogramParams:
   RECORD_HISTOGRAM_PARAMS = [
-      HistogramParams('ActiveEnergyBurned', 600, 2400, 30, 0),
-      HistogramParams('AppleExerciseTime', 30, 330, 30, 0),
-      HistogramParams('AppleStandTime', 100, 550, 30, 0),
-      HistogramParams('DistanceWalkingRunning', 5, 35, 30, 1),
-      HistogramParams('FlightsClimbed', 0, 90, 30, 0),
-      HistogramParams('StepCount', 6000, 42000, 30, 0),
-      HistogramParams('TimeInDaylight', 0, 360, 30, 0)]
+      HistogramParams('ActiveEnergyBurned', 600, 2400, 30),
+      HistogramParams('AppleExerciseTime', 30, 330, 30),
+      HistogramParams('AppleStandTime', 100, 550, 30),
+      HistogramParams('DistanceWalkingRunning', 5, 35, 30),
+      HistogramParams('FlightsClimbed', 0, 90, 30),
+      HistogramParams('StepCount', 6000, 42000, 30),
+      HistogramParams('TimeInDaylight', 0, 360, 30)]
 
 class GraphParams:
   GRAPH_START_DATE = date(2021, 1, 1)
