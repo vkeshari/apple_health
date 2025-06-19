@@ -21,8 +21,8 @@ class LineGraph:
                       par.AggregationPeriod.WEEKLY,
                       par.AggregationPeriod.DAILY]
   
-  _show_points = par.AggregationPeriod.QUARTERLY
   _show_lines = par.AggregationPeriod.MONTHLY
+  _show_points = par.AggregationPeriod.QUARTERLY
   _show_intervals = par.AggregationPeriod.QUARTERLY
   _interval_percentiles = [[25, 75], [10, 90], [5, 95]]
 
@@ -53,8 +53,11 @@ class LineGraph:
     for period in datasets:
       self.dates[period] = list(sorted(datasets[period].keys()))
       self.data_series[period] = [datasets[period][d] for d in self.dates[period]]
+    
     self.largest_period = self.get_largest_period(datasets.keys())
+    assert self.largest_period in [par.AggregationPeriod.MONTHLY, par.AggregationPeriod.QUARTERLY]
     self.smallest_period = self.get_smallest_period(datasets.keys())
+    assert self.smallest_period in [par.AggregationPeriod.DAILY, par.AggregationPeriod.WEEKLY]
 
     actual_start_date = max(min(self.dates[self.largest_period]), start_date)
     self.start_date = timeutil.CalendarUtil.get_period_start_date(actual_start_date,
@@ -112,11 +115,11 @@ class LineGraph:
     interval_handles = []
     labels = []
     for period in self.dates:
-      if period == par.AggregationPeriod.DAILY:
+      if period == self.smallest_period:
         s = plt.scatter(self.dates[period], self.data_series[period],
                         s = 50, c = 'tab:gray', alpha = 0.1)
         all_handles.append(s)
-        labels.append('Daily Values')
+        labels.append("{} Values".format(common.GraphText.pretty_enum(period, capitalize = True)))
         
         if self._show_intervals:
           interval_data = {}
