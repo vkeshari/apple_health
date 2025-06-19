@@ -131,3 +131,8 @@ class BucketedGraphParams:
                           AggregationPeriod.WEEKLY]
   BUCKETING = BucketingType.RANDOMLY
   NUM_RANDOM_BUCKETS = 10
+
+class BucketTuningParams:
+  MIN_BUCKETS = 5
+  MAX_BUCKETS = 50
+  BUCKET_STEP = 5

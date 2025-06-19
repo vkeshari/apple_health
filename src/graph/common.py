@@ -94,8 +94,8 @@ class GraphText:
       return 'Averages'
 
   @classmethod
-  def get_graph_title(cls, record_type, record_unit, start_date, end_date,
-                      record_aggregation_type, period, bucketing = None):
+  def get_graph_title(cls, record_type, record_unit, start_date, end_date, record_aggregation_type,
+                      period = par.AggregationPeriod.DAILY, bucketing = None):
     record_aggregation_text = cls.get_aggregation_type_text(record_aggregation_type)
     title_text_1 = "{} ({})".format(record_type, record_unit)
     if period == par.AggregationPeriod.DAILY:
@@ -193,5 +193,15 @@ class GraphTickSpacer:
       return list(range(lower, upper, 50)), list(range(lower, upper, 10))
     elif difference <= 1000:
       return list(range(lower, upper, 100)), list(range(lower, upper, 20))
+    elif difference <= 2000:
+      return list(range(lower, upper, 200)), list(range(lower, upper, 50))
+    elif difference <= 5000:
+      return list(range(lower, upper, 500)), list(range(lower, upper, 100))
+    elif difference <= 10000:
+      return list(range(lower, upper, 1000)), list(range(lower, upper, 200))
+    elif difference <= 20000:
+      return list(range(lower, upper, 2000)), list(range(lower, upper, 500))
+    elif difference <= 50000:
+      return list(range(lower, upper, 5000)), list(range(lower, upper, 1000))
     else:
-      return list(range(lower, upper, 100)), []
+      return list(range(lower, upper, 10000)), []

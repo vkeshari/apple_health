@@ -47,6 +47,14 @@ class Validator:
     if par.BucketedGraphParams.BUCKETING == par.BucketingType.RANDOMLY:
       assert 1 < par.BucketedGraphParams.NUM_RANDOM_BUCKETS <= 10
 
+  @classmethod
+  def validate_bucket_tuning(cls):
+    cls.validate_data_params()
+
+    assert 0 < par.BucketTuningParams.MIN_BUCKETS < par.BucketTuningParams.MAX_BUCKETS
+    assert 0 < par.BucketTuningParams.BUCKET_STEP < \
+                (par.BucketTuningParams.MAX_BUCKETS - par.BucketTuningParams.MIN_BUCKETS)
+
 
 class RecordProperties:
 

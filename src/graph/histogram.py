@@ -204,7 +204,8 @@ class SingleSeriesHistogram(Histogram):
   def init_plot(self):
     title_text = common.GraphText.get_graph_title(self.record_type, self.record_units,
                                                   self.start_date, self.end_date,
-                                                  self.record_aggregation_type, self.period)
+                                                  self.record_aggregation_type,
+                                                  period = self.period)
     Histogram.init_plot(self, title_text, self.ylim)
 
   def plot(self, show = False, save = False):
@@ -251,8 +252,9 @@ class MultiSeriesHistogram(Histogram):
   def init_plot(self):
     title_text = common.GraphText.get_graph_title(self.record_type, self.record_units,
                                                   self.start_date, self.end_date,
-                                                  self.record_aggregation_type, self.period,
-                                                  self.bucketing)
+                                                  self.record_aggregation_type,
+                                                  period = self.period,
+                                                  bucketing = self.bucketing)
     Histogram.init_plot(self, title_text, self.ylim)
 
   def plot(self, show = False, save = False):
