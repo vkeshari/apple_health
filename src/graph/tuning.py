@@ -24,8 +24,6 @@ class TuningGraph:
     self.averages = {b: np.average(datasets[b]) for b in self.buckets}
     self.stds = {b: np.std(datasets[b]) for b in self.buckets}
     self.p5s = {b: np.percentile(datasets[b], 5, method = 'nearest') for b in self.buckets}
-    self.p10s = {b: np.percentile(datasets[b], 10, method = 'nearest') for b in self.buckets}
-    self.p90s = {b: np.percentile(datasets[b], 90, method = 'nearest') for b in self.buckets}
     self.p95s = {b: np.percentile(datasets[b], 95, method = 'nearest') for b in self.buckets}
 
     self.fig, self.ax = plt.subplots(figsize = self._resolution)
@@ -76,12 +74,13 @@ class TuningGraph:
     for b in self.buckets:
       plt.scatter([b] * len(self.datasets[b]), self.datasets[b],
                   s = 50, c = 'tab:gray', alpha = 0.1)
-      plt.plot([b, b], [self.averages[b] - self.stds[b], self.averages[b] + self.stds[b]],
-                linewidth = 5, color = 'tab:blue', alpha = 0.7, antialiased = True)
-      plt.plot([b, b], [self.p10s[b], self.p90s[b]],
-                linewidth = 3, color = 'tab:blue', alpha = 0.7, antialiased = True)
-      plt.plot([b, b], [self.p5s[b], self.p95s[b]],
-                linewidth = 2, color = 'tab:blue', alpha = 0.7, antialiased = True)
+      plt.errorbar(b, self.averages[b], yerr = self.stds[b],
+                    linewidth = 8, capsize = 6, capthick = 2,
+                    color = 'tab:blue', alpha = 0.5, antialiased = True)
+      plt.errorbar(b, self.averages[b],
+                    yerr = np.array([self.averages[b] - self.p5s[b], self.p95s[b] - self.averages[b]]).reshape(2, -1),
+                    linewidth = 4, capsize = 3, capthick = 1,
+                    color = 'tab:blue', alpha = 0.5, antialiased = True)
 
     if save:
       save_filename = "TUNING_{}_{}_{}.png".format(self.min_buckets, self.max_buckets,

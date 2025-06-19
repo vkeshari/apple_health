@@ -133,6 +133,6 @@ class BucketedGraphParams:
   NUM_RANDOM_BUCKETS = 10
 
 class BucketTuningParams:
-  MIN_BUCKETS = 5
-  MAX_BUCKETS = 50
-  BUCKET_STEP = 5
+  MIN_BUCKETS = 2
+  MAX_BUCKETS = 100
+  BUCKET_STEP = 2
