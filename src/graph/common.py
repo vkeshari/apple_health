@@ -1,4 +1,5 @@
 import numpy as np
+from dataclasses import dataclass
 from matplotlib import pyplot as plt
 from scipy import stats
 
@@ -180,38 +181,44 @@ class GraphMultiTextPrinter:
       self.annotation_printer.plot_annotation(x = self.x, y = self.get_y_position(), s = s)
     self.newline()
 
+@dataclass
+class GraphTickSpacing:
+  upper_bound: float
+  major_spacing: float
+  minor_spacing: float
+
 class GraphTickSpacer:
+
+  # This list must be sorted in ascending order of upper_bound
+  _ticks_by_upper_bounds = [
+      GraphTickSpacing(1, 0.2, 0.1),
+      GraphTickSpacing(5, 1, 0.2),
+      GraphTickSpacing(10, 1, 0.5),
+      GraphTickSpacing(20, 2, 1),
+      GraphTickSpacing(50, 5, 1),
+      GraphTickSpacing(100, 10, 2),
+      GraphTickSpacing(200, 20, 5),
+      GraphTickSpacing(500, 50, 10),
+      GraphTickSpacing(1000, 100, 20),
+      GraphTickSpacing(2000, 200, 50),
+      GraphTickSpacing(5000, 500, 100),
+      GraphTickSpacing(10000, 1000, 200),
+      GraphTickSpacing(20000, 2000, 500),
+      GraphTickSpacing(50000, 5000, 1000),
+      GraphTickSpacing(100000, 10000, 2000),
+      GraphTickSpacing(1000000, 100000, 20000),
+  ]
+
+  last_upper_bound = 0
+  for gts in _ticks_by_upper_bounds:
+    assert gts.upper_bound > gts.major_spacing > gts.minor_spacing
+    assert gts.upper_bound > last_upper_bound
+    last_upper_bound = gts.upper_bound
   
   @classmethod
   def get_ticks(cls, lower, upper):
     difference = upper - lower
-    if difference <= 1:
-      return np.arange(lower, upper, 0.2), np.arange(lower, upper, 0.1)
-    if difference <= 5:
-      return list(range(lower, upper)), np.arange(lower, upper, 0.2)
-    if difference <= 10:
-      return list(range(lower, upper)), np.arange(lower, upper, 0.5)
-    elif difference <= 20:
-      return list(range(lower, upper, 2)), list(range(lower, upper))
-    elif difference <= 50:
-      return list(range(lower, upper, 5)), list(range(lower, upper))
-    elif difference <= 100:
-      return list(range(lower, upper, 10)), list(range(lower, upper, 2))
-    elif difference <= 200:
-      return list(range(lower, upper, 20)), list(range(lower, upper, 5))
-    elif difference <= 500:
-      return list(range(lower, upper, 50)), list(range(lower, upper, 10))
-    elif difference <= 1000:
-      return list(range(lower, upper, 100)), list(range(lower, upper, 20))
-    elif difference <= 2000:
-      return list(range(lower, upper, 200)), list(range(lower, upper, 50))
-    elif difference <= 5000:
-      return list(range(lower, upper, 500)), list(range(lower, upper, 100))
-    elif difference <= 10000:
-      return list(range(lower, upper, 1000)), list(range(lower, upper, 200))
-    elif difference <= 20000:
-      return list(range(lower, upper, 2000)), list(range(lower, upper, 500))
-    elif difference <= 50000:
-      return list(range(lower, upper, 5000)), list(range(lower, upper, 1000))
-    else:
-      return list(range(lower, upper, 10000)), []
+    for gts in cls._ticks_by_upper_bounds:
+      if difference <= gts.upper_bound:
+        return np.arange(lower, upper, gts.major_spacing), \
+                np.arange(lower, upper, gts.minor_spacing)
