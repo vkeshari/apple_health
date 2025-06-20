@@ -10,6 +10,10 @@ class DataMetrics:
   @classmethod
   def get_average(cls, data_series):
     return np.average(data_series)
+
+  @classmethod
+  def get_std(cls, data_series):
+    return np.std(data_series)
   
   @classmethod
   def get_percentile(cls, data_series, p):
@@ -39,7 +43,7 @@ class DataMetrics:
     data_stats = {}
     data_stats['average'] = cls.get_average(data_series)
     data_stats['median'] = cls.get_median(data_series)
-    data_stats['stdev'] = np.std(data_series)
+    data_stats['stdev'] = cls.get_std(data_series)
     data_stats['skew'] = stats.skew(data_series)
     data_stats['kurtosis'] = stats.kurtosis(data_series)
     data_stats['top_values'] = data_series[-top_values : ]
@@ -55,6 +59,15 @@ class DataMetrics:
     data_stats['middle_90'] = tuple([percentiles[5], percentiles[95]])
 
     return data_stats
+  
+  @classmethod
+  def get_nsigma_interval(cls, data_series, nsigma = 3):
+    assert nsigma >= 1
+
+    av = cls.get_average(data_series)
+    std = cls.get_std(data_series)
+
+    return av - nsigma * std, av + nsigma * std
 
   @classmethod
   def get_top_values_count(cls, period):
