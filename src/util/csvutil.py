@@ -2,6 +2,7 @@ from csv import DictReader, DictWriter
 from datetime import datetime, date
 
 import params as par
+from . import timeutil
 
 class CsvIO:
 
@@ -79,3 +80,22 @@ class XmlToCsv:
           data_dict[d][r] = 0
     
     return data_dict
+
+
+class CsvData:
+
+  @classmethod
+  def build_time_series_for_record(cls, r, data_dict, unit, start_date = None, end_date = None):
+    r_by_date = {}
+    for d in data_dict:
+      if r not in data_dict[d]:
+        continue
+      if not timeutil.DatetimeUtil.check_date_range(d, start_date, end_date):
+        continue
+      if data_dict[d][r] == 0:
+        continue
+      r_by_date[d] = data_dict[d][r]
+      if unit == '%':
+        r_by_date[d] *= 100.0
+    
+    return r_by_date

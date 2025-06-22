@@ -35,14 +35,8 @@ def build_period_bucket_graphs(data_dict, record_aggregation_types, record_units
 
   print()
   for r in record_aggregation_types:
-    r_by_date = {}
-    for d in data_dict:
-      if r not in data_dict[d]:
-        continue
-      if not timeutil.DatetimeUtil.check_date_range(d, start_date, end_date):
-        continue
-      if not data_dict[d][r] == 0:
-        r_by_date[d] = data_dict[d][r]
+    r_by_date = csvutil.CsvData.build_time_series_for_record(r, data_dict, record_units[r],
+                                                                start_date, end_date)
 
     if bucketing == par.BucketingType.BY_YEAR:
       datasets = bucket_by_year(r_by_date)
