@@ -55,6 +55,7 @@ class Validator:
     assert 0 < par.BucketTuningParams.MIN_BUCKETS < par.BucketTuningParams.MAX_BUCKETS
     assert 0 < par.BucketTuningParams.BUCKET_STEP < \
                 (par.BucketTuningParams.MAX_BUCKETS - par.BucketTuningParams.MIN_BUCKETS)
+    assert 0 < par.BucketTuningParams.NUM_RUNS
 
 
 class RecordProperties:

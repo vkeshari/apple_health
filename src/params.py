@@ -90,6 +90,8 @@ class BucketTuningParams:
   MAX_BUCKETS = 60
   BUCKET_STEP = 1
 
+  NUM_RUNS = 20
+
 
 # Record and graph configs
 

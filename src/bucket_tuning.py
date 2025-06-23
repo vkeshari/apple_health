@@ -14,9 +14,10 @@ def bucket_randomly(r_values, num_buckets):
   for i, vs in enumerate(value_subsets):
     subset_averages.append(np.average(vs))
 
-  return subset_averages
+  return sorted(subset_averages)
 
-def build_bucket_tuning_graphs(data_dict, record_aggregation_types, record_units, bucket_range):
+def build_bucket_tuning_graphs(data_dict, record_aggregation_types, record_units,
+                                bucket_range, num_runs):
   assert not record_aggregation_types.keys() ^ record_units.keys()
 
   for r in record_aggregation_types:
@@ -27,7 +28,14 @@ def build_bucket_tuning_graphs(data_dict, record_aggregation_types, record_units
 
     datasets = {}
     for num_buckets in bucket_range:
-      datasets[num_buckets] = bucket_randomly(r_by_date.values(), num_buckets = num_buckets)
+      run_subset_averages = [bucket_randomly(r_by_date.values(), num_buckets = num_buckets) \
+                                for _ in range(num_runs)]
+      datasets[num_buckets] = []
+      zipped_run_subset_averages = zip(*run_subset_averages)
+      for vals in zipped_run_subset_averages:
+        assert len(vals) == num_runs
+        datasets[num_buckets].append(np.average(vals))
+      assert len(datasets) == num_buckets
 
     print()
     print("Built Bucket Tuning Datasets for {}.".format(r))
@@ -51,7 +59,8 @@ def bucket_tuning():
   bucket_range = list(range(par.BucketTuningParams.MIN_BUCKETS,
                             par.BucketTuningParams.MAX_BUCKETS + 1,
                             par.BucketTuningParams.BUCKET_STEP))
-  build_bucket_tuning_graphs(data_dict, record_aggregation_types, record_units, bucket_range)
+  build_bucket_tuning_graphs(data_dict, record_aggregation_types, record_units,
+                              bucket_range, par.BucketTuningParams.NUM_RUNS)
 
 if __name__ == '__main__':
   bucket_tuning()
