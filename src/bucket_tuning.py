@@ -42,7 +42,7 @@ def build_bucket_tuning_graphs(data_dict, record_aggregation_types, record_units
     
     tuning_graph = tuning.TuningGraph(datasets, r,
                                       record_units[r], record_aggregation_types[r],
-                                      data_points = len(r_by_date))
+                                      raw_values = list(r_by_date.values()), num_runs = num_runs)
     tuning_graph.plot(show = False, save = True)
 
 
