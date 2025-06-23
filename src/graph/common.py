@@ -36,7 +36,7 @@ class DataMetrics:
     return data_percentiles
   
   @classmethod
-  def get_stats(cls, data_series, include_percentiles, top_values):
+  def get_stats(cls, data_series, include_percentiles, top_values = 1):
     assert len(data_series) >= top_values
     data_series = sorted(data_series)
 
