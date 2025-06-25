@@ -13,6 +13,30 @@ class XmlParse:
   _checkpoint_every_n_records = 1000000
 
   @classmethod
+  def aggregate_by_hour(cls, records_by_date, records_to_agg_type):
+    for r in records_by_date:
+      for d in records_by_date[r]:
+        for hr in records_by_date[r][d]:
+          if records_to_agg_type[r] == par.AggregateType.SUM:
+            records_by_date[r][d][hr] = np.sum(records_by_date[r][d][hr])
+          elif records_to_agg_type[r] in [par.AggregateType.AVERAGE, par.AggregateType.MEDIAN]:
+            records_by_date[r][d][hr] = np.average(records_by_date[r][d][hr])
+    return records_by_date
+  
+  @classmethod
+  def aggregate_by_day(cls, records_by_date, records_to_agg_type):
+    for r in records_by_date:
+      for d in records_by_date[r]:
+        if records_to_agg_type[r] == par.AggregateType.SUM:
+          records_by_date[r][d] = np.sum(list(records_by_date[r][d].values()))
+        elif records_to_agg_type[r] == par.AggregateType.AVERAGE:
+          records_by_date[r][d] = np.average(list(records_by_date[r][d].values()))
+        elif records_to_agg_type[r] == par.AggregateType.MEDIAN:
+          records_by_date[r][d] = np.percentile(list(records_by_date[r][d].values()),
+                                                50, method = 'nearest')
+    return records_by_date
+
+  @classmethod
   def parse_xml_data(cls, xml_tree, start_date, end_date,
                       parse_timezone, show_checkpoints = False):
     records_to_units = {rt.record: rt.unit for rt in cls._record_types}
@@ -22,7 +46,7 @@ class XmlParse:
     full_record_names = {r: cls._record_type_prefix + r.name for r in records_by_date}
     
     skip_iphone_records_full_names = \
-        [cls._record_type_prefix + sir for sir in cls._skip_iphone_records]
+        [cls._record_type_prefix + sir.name for sir in cls._skip_iphone_records]
     for i, record in enumerate(xml_tree.getroot().findall('Record')):
       if show_checkpoints and i % cls._checkpoint_every_n_records == 0:
         print ("Processed: {}".format(i))
@@ -40,21 +64,17 @@ class XmlParse:
         if record.attrib['type'] == full_record_names[r] \
               and record.attrib['unit'] == records_to_units[r]:
           record_date = record_datetime.date()
+          record_hour = record_datetime.hour
           if record_date not in records_by_date[r]:
-            records_by_date[r][record_date] = []
-          records_by_date[r][record_date].append(eval(record.attrib['value']))
+            records_by_date[r][record_date] = {}
+          if record_hour not in records_by_date[r][record_date]:
+            records_by_date[r][record_date][record_hour] = []
+          
+          v = eval(record.attrib['value'])
+          records_by_date[r][record_date][record_hour].append(v)
           break
     
-    for r in records_by_date:
-      for d in records_by_date[r]:
-        if records_to_agg_type[r] == par.AggregateType.SUM:
-          sum_val = np.sum(records_by_date[r][d])
-          records_by_date[r][d] = round(sum_val, 2)
-        elif records_to_agg_type[r] == par.AggregateType.AVERAGE:
-          avg_val = np.average(records_by_date[r][d])
-          records_by_date[r][d] = round(avg_val, 2)
-        elif records_to_agg_type[r] == par.AggregateType.MEDIAN:
-          median_val = np.percentile(records_by_date[r][d], 50, method = 'nearest')
-          records_by_date[r][d] = round(median_val, 2)
+    cls.aggregate_by_hour(records_by_date, records_to_agg_type)
+    cls.aggregate_by_day(records_by_date, records_to_agg_type)
     
     return records_by_date

@@ -13,9 +13,9 @@ def aggregate_data_by_period(daily_data_dict, period):
     if period_start_date not in periodly_data_dict:
       periodly_data_dict[period_start_date] = {}
     for r in daily_data_dict[d]:
-      if r not in periodly_data_dict[period_start_date]:
-        periodly_data_dict[period_start_date][r] = []
-      periodly_data_dict[period_start_date][r].append(daily_data_dict[d][r])
+      if r.name not in periodly_data_dict[period_start_date]:
+        periodly_data_dict[period_start_date][r.name] = []
+      periodly_data_dict[period_start_date][r.name].append(daily_data_dict[d][r])
 
   for p in periodly_data_dict:
     for r in periodly_data_dict[p]:

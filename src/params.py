@@ -1,7 +1,34 @@
 from dataclasses import dataclass
-from enum import Enum
+from enum import Enum, unique
 
 from datetime import date
+
+# Activity Record Types
+
+@unique
+class Activity(Enum):
+  ActiveEnergyBurned = 0
+  AppleExerciseTime = 1
+  AppleStandTime = 2
+  BodyMass = 3
+  DistanceWalkingRunning = 4
+  FlightsClimbed = 5
+  HeartRate = 6
+  HeartRateRecoveryOneMinute = 7
+  PhysicalEffort = 8
+  RespiratoryRate = 9
+  RestingHeartRate = 10
+  StairAscentSpeed = 11
+  StairDescentSpeed = 12
+  StepCount = 13
+  TimeInDaylight = 14
+  VO2Max = 15
+  WalkingAsymmetryPercentage = 16
+  WalkingDoubleSupportPercentage = 17
+  WalkingSpeed = 18
+
+
+# Script Configs
 
 class ParseTimezone(Enum):
   # Parse all data in current timezone
@@ -29,9 +56,9 @@ class ParserParams:
   WRITE_DATA = True
 
   # These records are double-counted by iPhone. Only include data from Apple Watch.
-  SKIP_IPHONE_RECORDS = ['DistanceWalkingRunning',
-                          'FlightsClimbed',
-                          'StepCount']
+  SKIP_IPHONE_RECORDS = [Activity.DistanceWalkingRunning,
+                          Activity.FlightsClimbed,
+                          Activity.StepCount]
 
 class XmlDebugParams:
   SKIP_DIETARTY_DATA = True
@@ -93,29 +120,7 @@ class BucketTuningParams:
   NUM_RUNS = 20
 
 
-# Record and graph configs
-
-class Activity(Enum):
-  ActiveEnergyBurned = 0
-  AppleExerciseTime = 1
-  AppleStandTime = 2
-  BodyMass = 3
-  DistanceWalkingRunning = 4
-  FlightsClimbed = 5
-  HeartRate = 6
-  HeartRateRecoveryOneMinute = 7
-  PhysicalEffort = 8
-  RespiratoryRate = 9
-  RestingHeartRate = 10
-  StairAscentSpeed = 11
-  StairDescentSpeed = 12
-  StepCount = 13
-  TimeInDaylight = 14
-  VO2Max = 15
-  WalkingAsymmetryPercentage = 16
-  WalkingDoubleSupportPercentage = 17
-  WalkingSpeed = 18
-
+# Record and Graph Configs
 
 class AggregateType(Enum):
   SUM = 0

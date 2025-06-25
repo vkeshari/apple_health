@@ -37,7 +37,7 @@ class CsvIO:
   def write_data_csv(cls, out_csv, data_dict):
     fields = set()
     for d in data_dict:
-      fields = fields | {r.name for r in data_dict[d].keys()}
+      fields = fields | data_dict[d].keys()
 
     start_time = datetime.now()
 
@@ -70,14 +70,14 @@ class XmlToCsv:
       for d in records_by_date[r]:
         if d not in data_dict:
           data_dict[d] = {}
-        data_dict[d][r] = records_by_date[r][d]
+        data_dict[d][r.name] = round(records_by_date[r][d], 2)
     
     # Record types that use a sum for aggregation must have 0s instead of missing values so that
     #   averages are calculated correctly.
     for d in data_dict:
       for r in cls._sum_type_records:
-        if r not in data_dict[d]:
-          data_dict[d][r] = 0
+        if r.name not in data_dict[d]:
+          data_dict[d][r.name] = 0
     
     return data_dict
 

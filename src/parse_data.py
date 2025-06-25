@@ -42,11 +42,11 @@ def parse_data():
   print("Input read in {}".format(datetime.now() - start_time))
 
   data_dict = process_xml(in_tree,
-                            start_date = par.DataParams.START_DATE,
-                            end_date = par.DataParams.END_DATE,
-                            parse_timezone = par.DataParams.PARSE_TIMEZONE,
-                            show_summary = par.ParserParams.SHOW_SUMMARY,
-                            parse_data = par.ParserParams.PARSE_DATA)
+                          start_date = par.DataParams.START_DATE,
+                          end_date = par.DataParams.END_DATE,
+                          parse_timezone = par.DataParams.PARSE_TIMEZONE,
+                          show_summary = par.ParserParams.SHOW_SUMMARY,
+                          parse_data = par.ParserParams.PARSE_DATA)
   if par.ParserParams.WRITE_DATA:
     out_csv = dio.get_csv_file()
     csvutil.CsvIO.write_data_csv(out_csv, data_dict)
