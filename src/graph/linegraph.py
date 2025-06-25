@@ -12,7 +12,7 @@ class LineGraph:
   _text_spacing_factor = 0.03
   _subfolder = Path('line') / timeutil.Timestamp.get_timestamp()
   _dio = dataio.DataIO(par.DataParams)
-  _record_to_text_precision = paramutil.RecordHistogramProperties.get_text_precision()
+  _record_to_text_precision = paramutil.RecordProperties.get_text_precision()
   _record_to_ymin, _record_to_ymax = paramutil.RecordLineGraphProperties.get_y_bounds()
 
   _largest_periods = [par.AggregationPeriod.QUARTERLY,
@@ -76,7 +76,7 @@ class LineGraph:
                                                   self.record_aggregation_type)
     self.ax.set_title(title_text)
     self.ax.set_xlabel("Date")
-    self.ax.set_ylabel(self.record_type)
+    self.ax.set_ylabel(self.record_type.name)
 
     self.ax.set_xlim(self.start_date, self.end_date)
     self.ax.grid(True, which = 'major', axis = 'x', alpha = 0.5)
@@ -162,7 +162,7 @@ class LineGraph:
     self.ax.legend(handles = all_handles, labels = labels, loc = 'upper right')
 
     if save:
-      save_filename = "{}_{}_{}.png".format(self.record_type,
+      save_filename = "{}_{}_{}.png".format(self.record_type.name,
                                                 self.start_date.strftime("%Y%m%d"),
                                                 self.end_date.strftime("%Y%m%d"))
       self.show_or_save(show = show, save_filename = save_filename)

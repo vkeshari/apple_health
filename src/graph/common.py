@@ -115,7 +115,7 @@ class GraphText:
   def get_graph_title(cls, record_type, record_unit, start_date, end_date, record_aggregation_type,
                       period = par.AggregationPeriod.DAILY, bucketing = None):
     record_aggregation_text = cls.get_aggregation_type_text(record_aggregation_type)
-    title_text_1 = "{} ({})".format(record_type, record_unit)
+    title_text_1 = "{} ({})".format(record_type.name, record_unit)
     if period == par.AggregationPeriod.DAILY:
       title_text_2 = "Daily {}".format(record_aggregation_text)
     elif period in [par.AggregationPeriod.WEEKLY,

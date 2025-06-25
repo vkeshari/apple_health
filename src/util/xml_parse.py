@@ -19,7 +19,7 @@ class XmlParse:
     records_to_agg_type = {rt.record: rt.aggregation for rt in cls._record_types}
 
     records_by_date = {rt.record: {} for rt in cls._record_types}
-    full_record_names = {r: cls._record_type_prefix + r for r in records_by_date}
+    full_record_names = {r: cls._record_type_prefix + r.name for r in records_by_date}
     
     skip_iphone_records_full_names = \
         [cls._record_type_prefix + sir for sir in cls._skip_iphone_records]

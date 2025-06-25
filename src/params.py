@@ -95,6 +95,28 @@ class BucketTuningParams:
 
 # Record and graph configs
 
+class Activity(Enum):
+  ActiveEnergyBurned = 0
+  AppleExerciseTime = 1
+  AppleStandTime = 2
+  BodyMass = 3
+  DistanceWalkingRunning = 4
+  FlightsClimbed = 5
+  HeartRate = 6
+  HeartRateRecoveryOneMinute = 7
+  PhysicalEffort = 8
+  RespiratoryRate = 9
+  RestingHeartRate = 10
+  StairAscentSpeed = 11
+  StairDescentSpeed = 12
+  StepCount = 13
+  TimeInDaylight = 14
+  VO2Max = 15
+  WalkingAsymmetryPercentage = 16
+  WalkingDoubleSupportPercentage = 17
+  WalkingSpeed = 18
+
+
 class AggregateType(Enum):
   SUM = 0
   AVERAGE = 1
@@ -108,25 +130,25 @@ class RecordType:
 
 class RecordParams:
   RECORD_TYPES = [
-      RecordType('ActiveEnergyBurned', 'Cal', AggregateType.SUM),
-      RecordType('AppleExerciseTime', 'min', AggregateType.SUM),
-      RecordType('AppleStandTime', 'min', AggregateType.SUM),
-      RecordType('BodyMass', 'kg', AggregateType.AVERAGE),
-      RecordType('DistanceWalkingRunning', 'km', AggregateType.SUM),
-      RecordType('FlightsClimbed', 'count', AggregateType.SUM),
-      RecordType('HeartRate', 'count/min', AggregateType.MEDIAN),
-      RecordType('HeartRateRecoveryOneMinute', 'count/min', AggregateType.MEDIAN),
-      RecordType('PhysicalEffort', 'kcal/hr·kg', AggregateType.MEDIAN),
-      RecordType('RespiratoryRate', 'count/min', AggregateType.MEDIAN),
-      RecordType('RestingHeartRate', 'count/min', AggregateType.MEDIAN),
-      RecordType('StairAscentSpeed', 'm/s', AggregateType.MEDIAN),
-      RecordType('StairDescentSpeed', 'm/s', AggregateType.MEDIAN),
-      RecordType('StepCount', 'count', AggregateType.SUM),
-      RecordType('TimeInDaylight', 'min', AggregateType.SUM),
-      RecordType('VO2Max', 'mL/min·kg', AggregateType.AVERAGE),
-      RecordType('WalkingAsymmetryPercentage', '%', AggregateType.AVERAGE),
-      RecordType('WalkingDoubleSupportPercentage', '%', AggregateType.AVERAGE),
-      RecordType('WalkingSpeed', 'km/hr', AggregateType.MEDIAN)]
+      RecordType(Activity.ActiveEnergyBurned, 'Cal', AggregateType.SUM),
+      RecordType(Activity.AppleExerciseTime, 'min', AggregateType.SUM),
+      RecordType(Activity.AppleStandTime, 'min', AggregateType.SUM),
+      RecordType(Activity.BodyMass, 'kg', AggregateType.AVERAGE),
+      RecordType(Activity.DistanceWalkingRunning, 'km', AggregateType.SUM),
+      RecordType(Activity.FlightsClimbed, 'count', AggregateType.SUM),
+      RecordType(Activity.HeartRate, 'count/min', AggregateType.MEDIAN),
+      RecordType(Activity.HeartRateRecoveryOneMinute, 'count/min', AggregateType.MEDIAN),
+      RecordType(Activity.PhysicalEffort, 'kcal/hr·kg', AggregateType.MEDIAN),
+      RecordType(Activity.RespiratoryRate, 'count/min', AggregateType.MEDIAN),
+      RecordType(Activity.RestingHeartRate, 'count/min', AggregateType.MEDIAN),
+      RecordType(Activity.StairAscentSpeed, 'm/s', AggregateType.MEDIAN),
+      RecordType(Activity.StairDescentSpeed, 'm/s', AggregateType.MEDIAN),
+      RecordType(Activity.StepCount, 'count', AggregateType.SUM),
+      RecordType(Activity.TimeInDaylight, 'min', AggregateType.SUM),
+      RecordType(Activity.VO2Max, 'mL/min·kg', AggregateType.AVERAGE),
+      RecordType(Activity.WalkingAsymmetryPercentage, '%', AggregateType.AVERAGE),
+      RecordType(Activity.WalkingDoubleSupportPercentage, '%', AggregateType.AVERAGE),
+      RecordType(Activity.WalkingSpeed, 'km/hr', AggregateType.MEDIAN)]
 
 @dataclass
 class GraphTextParams:
@@ -135,25 +157,25 @@ class GraphTextParams:
 
 class RecordGraphTextParams:
   RECORD_GRAPH_TEXT_PARAMS = [
-      GraphTextParams('ActiveEnergyBurned', 0),
-      GraphTextParams('AppleExerciseTime', 0),
-      GraphTextParams('AppleStandTime', 0),
-      GraphTextParams('BodyMass', 1),
-      GraphTextParams('DistanceWalkingRunning', 1),
-      GraphTextParams('FlightsClimbed', 0),
-      GraphTextParams('HeartRate', 0),
-      GraphTextParams('HeartRateRecoveryOneMinute', 0),
-      GraphTextParams('PhysicalEffort', 1),
-      GraphTextParams('RespiratoryRate', 1),
-      GraphTextParams('RestingHeartRate', 0),
-      GraphTextParams('StairAscentSpeed', 1),
-      GraphTextParams('StairDescentSpeed', 1),
-      GraphTextParams('StepCount', 0),
-      GraphTextParams('TimeInDaylight', 0),
-      GraphTextParams('VO2Max', 1),
-      GraphTextParams('WalkingAsymmetryPercentage', 2),
-      GraphTextParams('WalkingDoubleSupportPercentage', 2),
-      GraphTextParams('WalkingSpeed', 1)]
+      GraphTextParams(Activity.ActiveEnergyBurned, 0),
+      GraphTextParams(Activity.AppleExerciseTime, 0),
+      GraphTextParams(Activity.AppleStandTime, 0),
+      GraphTextParams(Activity.BodyMass, 1),
+      GraphTextParams(Activity.DistanceWalkingRunning, 1),
+      GraphTextParams(Activity.FlightsClimbed, 0),
+      GraphTextParams(Activity.HeartRate, 0),
+      GraphTextParams(Activity.HeartRateRecoveryOneMinute, 0),
+      GraphTextParams(Activity.PhysicalEffort, 1),
+      GraphTextParams(Activity.RespiratoryRate, 1),
+      GraphTextParams(Activity.RestingHeartRate, 0),
+      GraphTextParams(Activity.StairAscentSpeed, 1),
+      GraphTextParams(Activity.StairDescentSpeed, 1),
+      GraphTextParams(Activity.StepCount, 0),
+      GraphTextParams(Activity.TimeInDaylight, 0),
+      GraphTextParams(Activity.VO2Max, 1),
+      GraphTextParams(Activity.WalkingAsymmetryPercentage, 2),
+      GraphTextParams(Activity.WalkingDoubleSupportPercentage, 2),
+      GraphTextParams(Activity.WalkingSpeed, 1)]
 
 @dataclass
 class HistogramParams:
@@ -164,13 +186,13 @@ class HistogramParams:
 
 class RecordHistogramParams:
   RECORD_HISTOGRAM_PARAMS = [
-      HistogramParams('ActiveEnergyBurned', 600, 2400, 30),
-      HistogramParams('AppleExerciseTime', 30, 330, 30),
-      HistogramParams('AppleStandTime', 100, 550, 30),
-      HistogramParams('DistanceWalkingRunning', 5, 35, 30),
-      HistogramParams('FlightsClimbed', 0, 90, 30),
-      HistogramParams('StepCount', 6000, 42000, 30),
-      HistogramParams('TimeInDaylight', 0, 360, 30)]
+      HistogramParams(Activity.ActiveEnergyBurned, 600, 2400, 30),
+      HistogramParams(Activity.AppleExerciseTime, 30, 330, 30),
+      HistogramParams(Activity.AppleStandTime, 100, 550, 30),
+      HistogramParams(Activity.DistanceWalkingRunning, 5, 35, 30),
+      HistogramParams(Activity.FlightsClimbed, 0, 90, 30),
+      HistogramParams(Activity.StepCount, 6000, 42000, 30),
+      HistogramParams(Activity.TimeInDaylight, 0, 360, 30)]
 
 @dataclass
 class LineGraphParams:
@@ -180,22 +202,22 @@ class LineGraphParams:
 
 class RecordLineGraphParams:
   RECORD_LINE_GRAPH_PARAMS = [
-      LineGraphParams('ActiveEnergyBurned', 0, 2500),
-      LineGraphParams('AppleExerciseTime', 0, 300),
-      LineGraphParams('AppleStandTime', 0, 500),
-      LineGraphParams('BodyMass', 70, 100),
-      LineGraphParams('DistanceWalkingRunning', 0, 25),
-      LineGraphParams('FlightsClimbed', 0, 100),
-      LineGraphParams('HeartRate', 40, 160),
-      LineGraphParams('HeartRateRecoveryOneMinute', 20, 60),
-      LineGraphParams('PhysicalEffort', 2, 6),
-      LineGraphParams('RespiratoryRate', 8, 24),
-      LineGraphParams('RestingHeartRate', 20, 80),
-      LineGraphParams('StairAscentSpeed', 0, 1),
-      LineGraphParams('StairDescentSpeed', 0, 1),
-      LineGraphParams('StepCount', 0, 40000),
-      LineGraphParams('TimeInDaylight', 0, 400),
-      LineGraphParams('VO2Max', 30, 50),
-      LineGraphParams('WalkingAsymmetryPercentage', 0, 100),
-      LineGraphParams('WalkingDoubleSupportPercentage', 20, 40),
-      LineGraphParams('WalkingSpeed', 2, 8)]
+      LineGraphParams(Activity.ActiveEnergyBurned, 0, 2500),
+      LineGraphParams(Activity.AppleExerciseTime, 0, 300),
+      LineGraphParams(Activity.AppleStandTime, 0, 500),
+      LineGraphParams(Activity.BodyMass, 70, 100),
+      LineGraphParams(Activity.DistanceWalkingRunning, 0, 25),
+      LineGraphParams(Activity.FlightsClimbed, 0, 100),
+      LineGraphParams(Activity.HeartRate, 40, 160),
+      LineGraphParams(Activity.HeartRateRecoveryOneMinute, 20, 60),
+      LineGraphParams(Activity.PhysicalEffort, 2, 6),
+      LineGraphParams(Activity.RespiratoryRate, 8, 24),
+      LineGraphParams(Activity.RestingHeartRate, 20, 80),
+      LineGraphParams(Activity.StairAscentSpeed, 0, 1),
+      LineGraphParams(Activity.StairDescentSpeed, 0, 1),
+      LineGraphParams(Activity.StepCount, 0, 40000),
+      LineGraphParams(Activity.TimeInDaylight, 0, 400),
+      LineGraphParams(Activity.VO2Max, 30, 50),
+      LineGraphParams(Activity.WalkingAsymmetryPercentage, 0, 100),
+      LineGraphParams(Activity.WalkingDoubleSupportPercentage, 20, 40),
+      LineGraphParams(Activity.WalkingSpeed, 2, 8)]

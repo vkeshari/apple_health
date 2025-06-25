@@ -24,7 +24,7 @@ class CsvIO:
     data_dict = {}
     for row in csv_data:
       d = date.fromisoformat(row['date'])
-      data_dict[d] = {r: eval(v) for (r, v) in row.items() \
+      data_dict[d] = {par.Activity[r]: eval(v) for (r, v) in row.items() \
                                     if not r == 'date' and not v == cls._restval}
     
     print()
@@ -37,7 +37,7 @@ class CsvIO:
   def write_data_csv(cls, out_csv, data_dict):
     fields = set()
     for d in data_dict:
-      fields = fields | data_dict[d].keys()
+      fields = fields | {r.name for r in data_dict[d].keys()}
 
     start_time = datetime.now()
 

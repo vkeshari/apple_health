@@ -17,7 +17,7 @@ class Histogram:
 
   _record_to_xmin, _record_to_xmax, _record_to_num_bins = \
       paramutil.RecordHistogramProperties.get_x_bounds(_major_x_ticks_spacing)
-  _record_to_text_precision = paramutil.RecordHistogramProperties.get_text_precision()
+  _record_to_text_precision = paramutil.RecordProperties.get_text_precision()
 
   def __init__(self, record_type, record_units, record_aggregation_type,
                 start_date, end_date, period):
@@ -51,7 +51,7 @@ class Histogram:
   
   def init_plot(self, title_text, ylim):
     self.ax.set_title(title_text)
-    self.ax.set_xlabel(self.record_type)
+    self.ax.set_xlabel(self.record_type.name)
     self.ax.set_ylabel("No. of {}".format(common.GraphText.get_period_text(self.period)))
 
     self.ax.set_xlim(self.get_xmin(), self.get_xmax())
@@ -219,7 +219,7 @@ class SingleSeriesHistogram(Histogram):
                     show_total_count = True, show_normal_stats = True, show_order_stats = True,
                     show_top_values = True, show_intervals = True)
     if save:
-      save_filename = "{}_{}_{}_{}.png".format(self.period.name, self.record_type,
+      save_filename = "{}_{}_{}_{}.png".format(self.period.name, self.record_type.name,
                                                 self.start_date.strftime("%Y%m%d"),
                                                 self.end_date.strftime("%Y%m%d"))
       self.show_or_save(show = show, save_filename = save_filename)
@@ -271,7 +271,7 @@ class MultiSeriesHistogram(Histogram):
     
     if save:
       save_filename = "{}_{}_{}_{}_{}_{}.png".format(self.bucketing.name, len(self.data_series),
-                                                  self.record_type, self.period.name,
+                                                  self.period.name, self.record_type.name,
                                                   self.start_date.strftime("%Y%m%d"),
                                                   self.end_date.strftime("%Y%m%d"))
       self.show_or_save(show = show, save_filename = save_filename)

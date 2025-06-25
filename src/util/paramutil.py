@@ -73,6 +73,15 @@ class RecordProperties:
     for rt in par.RecordParams.RECORD_TYPES:
       record_units[rt.record] = rt.unit
     return record_units
+  
+  @classmethod
+  def get_text_precision(cls):
+    record_to_text_precision = {}
+    for rhp in par.RecordGraphTextParams.RECORD_GRAPH_TEXT_PARAMS:
+      record_type = rhp.record
+      record_to_text_precision[record_type] = rhp.text_precision
+
+    return record_to_text_precision
 
 
 class RecordHistogramProperties:
@@ -91,15 +100,6 @@ class RecordHistogramProperties:
       record_to_num_bins[record_type] = rhp.num_bins
     
     return record_to_xmin, record_to_xmax, record_to_num_bins
-  
-  @classmethod
-  def get_text_precision(cls):
-    record_to_text_precision = {}
-    for rhp in par.RecordGraphTextParams.RECORD_GRAPH_TEXT_PARAMS:
-      record_type = rhp.record
-      record_to_text_precision[record_type] = rhp.text_precision
-
-    return record_to_text_precision
 
 
 class RecordLineGraphProperties:

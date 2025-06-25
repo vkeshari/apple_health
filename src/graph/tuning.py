@@ -69,7 +69,7 @@ class TuningGraph:
     title_text = title_text + '\n' + "Average values per split by no. of splits"
     self.ax.set_title(title_text)
     self.ax.set_xlabel("No. of splits")
-    self.ax.set_ylabel("Average {} per split".format(self.record_type))
+    self.ax.set_ylabel("Average {} per split".format(self.record_type.name))
 
     self.ax.set_xlim(0, self.max_buckets)
     xticks_major, xticks_minor = common.GraphTickSpacer.get_ticks(0, self.max_buckets)
@@ -159,7 +159,7 @@ class TuningGraph:
 
     if save:
       save_filename = "TUNING_{}_{}_{}_{}.png".format(self.num_runs, self.min_buckets,
-                                                      self.max_buckets, self.record_type)
+                                                      self.max_buckets, self.record_type.name)
       self.show_or_save(show = show, save_filename = save_filename)
     else:
       self.show_or_save(show = show)
