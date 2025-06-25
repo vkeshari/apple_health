@@ -35,7 +35,6 @@ def aggregate_data():
   
   dio = dataio.DataIO(par.DataParams)
   in_csv = dio.get_csv_file()
-
   daily_data_dict = csvutil.CsvIO.read_data_csv(in_csv)
 
   for period in par.AggregatorParams.AGGREGATION_PERIODS:

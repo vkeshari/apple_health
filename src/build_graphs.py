@@ -8,20 +8,22 @@ def build_period_histograms(data_dict, record_aggregation_types, record_units,
 
   print()
   for r in record_aggregation_types:
+    if not record_aggregation_types[r] == par.AggregateType.SUM:
+      continue
+
     r_by_date = csvutil.CsvData.build_time_series_for_record(r, data_dict, record_units[r],
                                                                 start_date, end_date)
     r_by_sorted_date = {d: v for (d, v) in sorted(r_by_date.items())}
 
-    if record_aggregation_types[r] == par.AggregateType.SUM:
-      hist = histogram.SingleSeriesHistogram(
-                data = r_by_sorted_date,
-                record_type = r,
-                record_units = record_units[r],
-                record_aggregation_type = record_aggregation_types[r],
-                start_date = start_date,
-                end_date = end_date,
-                period = period)
-      hist.plot(show = False, save = True)
+    hist = histogram.SingleSeriesHistogram(
+              data = r_by_sorted_date,
+              record_type = r,
+              record_units = record_units[r],
+              record_aggregation_type = record_aggregation_types[r],
+              start_date = start_date,
+              end_date = end_date,
+              period = period)
+    hist.plot(show = False, save = True)
 
   print()
   print("Created {} histograms.".format(period.name.capitalize()))
@@ -61,12 +63,9 @@ def build_graphs():
 
   if par.GraphParams.HISTOGRAMS:
     for period in par.GraphParams.AGGREGATION_PERIODS:
-      if period == par.AggregationPeriod.DAILY:
-        data_csv = dio.get_csv_file()
-      else:
-        data_csv = dio.get_csv_file(period = period)
-
+      data_csv = dio.get_csv_file(period = period)
       data_dict = csvutil.CsvIO.read_data_csv(data_csv)
+
       build_period_histograms(data_dict, record_aggregation_types, record_units,
                               start_date = par.GraphParams.GRAPH_START_DATE,
                               end_date = par.GraphParams.GRAPH_END_DATE,
@@ -75,12 +74,9 @@ def build_graphs():
   if par.GraphParams.LINE_GRAPHS:
     data_dicts = {}
     for period in par.GraphParams.AGGREGATION_PERIODS:
-      if period == par.AggregationPeriod.DAILY:
-        daily_csv = dio.get_csv_file()
-        data_dicts[period] = csvutil.CsvIO.read_data_csv(daily_csv)
-      else:
-        period_csv = dio.get_csv_file(period = period)
-        data_dicts[period] = csvutil.CsvIO.read_data_csv(period_csv)
+      data_csv = dio.get_csv_file(period = period)
+      data_dicts[period] = csvutil.CsvIO.read_data_csv(data_csv)
+    
     build_line_graphs(data_dicts, record_aggregation_types, record_units,
                       start_date = par.GraphParams.GRAPH_START_DATE,
                       end_date = par.GraphParams.GRAPH_END_DATE)

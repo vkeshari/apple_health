@@ -138,35 +138,35 @@ class CalendarUtil:
       return cls.get_quarter_start_date(d)
   
   @classmethod
-  def get_next_day(cls, d):
-    return d + cls._one_day
+  def get_next_day(cls, d, n = 1):
+    return d + n * cls._one_day
   
   @classmethod
-  def get_next_week(cls, d):
-    return d + cls._one_week
+  def get_next_week(cls, d, n = 1):
+    return d + n * cls._one_week
   
   @classmethod
-  def get_next_month(cls, d):
-    return d + cls._one_month
+  def get_next_month(cls, d, n = 1):
+    return d + n * cls._one_month
   
   @classmethod
-  def get_next_quarter(cls, d):
-    return d + cls._one_quarter
+  def get_next_quarter(cls, d, n = 1):
+    return d + n * cls._one_quarter
   
   @classmethod
-  def get_next_period(cls, d, period):
+  def get_next_period(cls, d, period, n = 1):
     if period == par.AggregationPeriod.DAILY:
-      return cls.get_next_day(d)
+      return cls.get_next_day(d, n)
     elif period == par.AggregationPeriod.WEEKLY:
-      return cls.get_next_week(d)
+      return cls.get_next_week(d, n)
     elif period == par.AggregationPeriod.MONTHLY:
-      return cls.get_next_month(d)
+      return cls.get_next_month(d, n)
     elif period == par.AggregationPeriod.QUARTERLY:
-      return cls.get_next_quarter(d)
+      return cls.get_next_quarter(d, n)
   
   @classmethod
-  def get_next_period_start_date(cls, d, period):
-    return cls.get_next_period(cls.get_period_start_date(d, period), period)
+  def get_next_period_start_date(cls, d, period, n = 1):
+    return cls.get_next_period(cls.get_period_start_date(d, period), period, n)
   
   @classmethod
   def get_middle_of_period(cls, d, period):

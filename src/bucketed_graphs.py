@@ -68,12 +68,9 @@ def bucketed_graphs():
 
   dio = dataio.DataIO(par.DataParams)
   for period in par.BucketedGraphParams.AGGREGATION_PERIODS:
-    if period == par.AggregationPeriod.DAILY:
-      data_csv = dio.get_csv_file()
-    else:
-      data_csv = dio.get_csv_file(period = period)
-    
+    data_csv = dio.get_csv_file(period = period)
     data_dict = csvutil.CsvIO.read_data_csv(data_csv)
+    
     build_period_bucket_graphs(data_dict, record_aggregation_types, record_units,
                                 start_date = par.BucketedGraphParams.GRAPH_START_DATE,
                                 end_date = par.BucketedGraphParams.GRAPH_END_DATE,

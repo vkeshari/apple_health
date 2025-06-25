@@ -1,5 +1,7 @@
 from pathlib import Path
 
+import params as par
+
 class DataIO:
   def __init__(self, data_params):
     self.data_params = data_params
@@ -26,7 +28,7 @@ class DataIO:
     return self.graph_dir / filename
 
   def get_csv_file(self, period = None):
-    if period:
+    if period and not period == par.AggregationPeriod.DAILY:
       csv_filename = "{tz}_{start}_{end}{suffix}_{period}.csv".format(
                           tz = self.data_params.PARSE_TIMEZONE.name,
                           start = self.data_params.START_DATE.strftime("%Y%m%d"),
