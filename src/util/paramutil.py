@@ -56,6 +56,13 @@ class Validator:
     assert 0 < par.BucketTuningParams.BUCKET_STEP < \
                 (par.BucketTuningParams.MAX_BUCKETS - par.BucketTuningParams.MIN_BUCKETS)
     assert 0 < par.BucketTuningParams.NUM_RUNS
+  
+  @classmethod
+  def validate_record_comparison(cls):
+    cls.validate_data_params()
+
+    assert par.AggregationPeriod.QUARTERLY not in par.RecordComparisonParams.AGGREGATION_PERIODS
+    assert 0 <= par.RecordComparisonParams.PERIOD_DELTA
 
 
 class RecordProperties:

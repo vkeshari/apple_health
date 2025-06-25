@@ -66,7 +66,6 @@ class LineGraph:
                                                                       self.largest_period)
 
     self.fig, self.ax = plt.subplots(figsize = self._resolution)
-
     self.init_plot()
   
   def init_plot(self):

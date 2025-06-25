@@ -56,7 +56,6 @@ class TuningGraph:
 
     self.ylim = round(np.average(list(self.averages.values())) * 2)
     self.fig, self.ax = plt.subplots(figsize = self._resolution)
-
     self.init_plot()
   
   def init_plot(self):

@@ -95,7 +95,7 @@ class GraphParams:
                           AggregationPeriod.MONTHLY,
                           AggregationPeriod.QUARTERLY]
 
-  HISTOGRAMS = True
+  HISTOGRAMS = False
   LINE_GRAPHS = True
 
 class BucketingType(Enum):
@@ -118,6 +118,11 @@ class BucketTuningParams:
   BUCKET_STEP = 1
 
   NUM_RUNS = 20
+
+class RecordComparisonParams:
+  AGGREGATION_PERIODS = [AggregationPeriod.DAILY,
+                          AggregationPeriod.WEEKLY]
+  PERIOD_DELTA = 0
 
 
 # Record and Graph Configs
@@ -213,7 +218,7 @@ class RecordLineGraphParams:
       LineGraphParams(Activity.BodyMass, 70, 100),
       LineGraphParams(Activity.DistanceWalkingRunning, 0, 25),
       LineGraphParams(Activity.FlightsClimbed, 0, 100),
-      LineGraphParams(Activity.HeartRate, 40, 160),
+      LineGraphParams(Activity.HeartRate, 40, 120),
       LineGraphParams(Activity.HeartRateRecoveryOneMinute, 20, 60),
       LineGraphParams(Activity.PhysicalEffort, 2, 6),
       LineGraphParams(Activity.RespiratoryRate, 8, 24),
