@@ -129,7 +129,11 @@ class RecordComparisonParams:
   AGGREGATION_PERIODS = [AggregationPeriod.DAILY,
                           AggregationPeriod.WEEKLY,
                           AggregationPeriod.MONTHLY]
-  PERIOD_DELTA = 0
+  
+  MAX_PERIOD_DELTAS = {AggregationPeriod.DAILY: 14,
+                        AggregationPeriod.WEEKLY: 6,
+                        AggregationPeriod.MONTHLY: 3}
+  
   MIN_CORRELATIONS = {CorrelationType.PEARSON: 0.8,
                       CorrelationType.SPEARMAN: 0.8,
                       CorrelationType.KENDALL: 0.8}

@@ -2,21 +2,14 @@ import params as par
 
 from graph import comparison
 from util import csvutil, dataio, datautil, paramutil, timeutil
-
-def make_all_comparisons(data_dict, record_aggregation_types, record_units,
-                          period, period_delta, min_correlations):
-  assert not record_aggregation_types.keys() ^ record_units.keys()
   
-  record_types = record_aggregation_types.keys()
-
-  all_r_to_dates = {}
-  for r in record_types:
-    all_r_to_dates[r] = csvutil.CsvData.build_time_series_for_record(r, data_dict,
-                                                                      unit = record_units[r])
+def make_comparisons_with_period_delta(all_r_to_dates, record_aggregation_types, record_units,
+                                        period, period_delta, min_correlations):
 
   print()
-  print(period.name)
-  all_corrs = {}
+  print("{}\t+{}".format(period.name, period_delta))
+
+  record_types = all_r_to_dates.keys()
   for r1 in record_types:
     for r2 in record_types:
       if r1 == r2:
@@ -47,6 +40,21 @@ def make_all_comparisons(data_dict, record_aggregation_types, record_units,
                                         period, period_delta)
       com.plot(show = False, save = True)
 
+def make_all_comparisons(data_dict, record_aggregation_types, record_units,
+                          period, max_period_delta, min_correlations):
+  assert not record_aggregation_types.keys() ^ record_units.keys()
+  
+  record_types = record_aggregation_types.keys()
+
+  all_r_to_dates = {}
+  for r in record_types:
+    all_r_to_dates[r] = csvutil.CsvData.build_time_series_for_record(r, data_dict,
+                                                                      unit = record_units[r])
+  
+  for pd in range(max_period_delta):
+    make_comparisons_with_period_delta(all_r_to_dates, record_aggregation_types, record_units,
+                                        period, pd, min_correlations)
+
 
 def record_comparison():
   paramutil.Validator.validate_record_comparison()
@@ -61,7 +69,8 @@ def record_comparison():
     data_dict = csvutil.CsvIO.read_data_csv(data_csv)
 
     make_all_comparisons(data_dict, record_aggregation_types, record_units,
-                          period = period, period_delta = par.RecordComparisonParams.PERIOD_DELTA,
+                          period = period,
+                          max_period_delta = par.RecordComparisonParams.MAX_PERIOD_DELTAS[period],
                           min_correlations = par.RecordComparisonParams.MIN_CORRELATIONS)
 
 if __name__ == '__main__':
