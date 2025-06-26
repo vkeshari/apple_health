@@ -283,9 +283,9 @@ class MultiSeriesHistogram(Histogram):
     
     if save:
       save_filename = "{}_{}_{}_{}_{}_{}.png".format(self.bucketing.name, len(self.data_series),
-                                                  self.period.name, self.record_type.name,
-                                                  self.start_date.strftime("%Y%m%d"),
-                                                  self.end_date.strftime("%Y%m%d"))
+                                                      self.period.name, self.record_type.name,
+                                                      self.start_date.strftime("%Y%m%d"),
+                                                      self.end_date.strftime("%Y%m%d"))
       self.show_or_save(show = show, save_filename = save_filename)
     else:
       self.show_or_save(show = show)

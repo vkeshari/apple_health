@@ -12,11 +12,10 @@ def build_period_histograms(data_dict, record_aggregation_types, record_units,
       continue
 
     r_by_date = csvutil.CsvData.build_time_series_for_record(r, data_dict, record_units[r],
-                                                                start_date, end_date)
-    r_by_sorted_date = {d: v for (d, v) in sorted(r_by_date.items())}
+                                                                start_date, end_date, sort = True)
 
     hist = histogram.SingleSeriesHistogram(
-              data = r_by_sorted_date,
+              data = r_by_date,
               record_type = r,
               record_units = record_units[r],
               record_aggregation_type = record_aggregation_types[r],
@@ -36,8 +35,8 @@ def build_line_graphs(data_dicts, record_aggregation_types, record_units, start_
     period_datasets = {}
     for period, data_dict in data_dicts.items():
       r_by_date = csvutil.CsvData.build_time_series_for_record(r, data_dict, record_units[r],
-                                                                start_date, end_date)
-      period_datasets[period] = {d: v for (d, v) in sorted(r_by_date.items())}
+                                                                start_date, end_date, sort = True)
+      period_datasets[period] = r_by_date
 
     if par.GraphParams.LINE_GRAPHS:
       line = linegraph.LineGraph(

@@ -85,7 +85,9 @@ class XmlToCsv:
 class CsvData:
 
   @classmethod
-  def build_time_series_for_record(cls, r, data_dict, unit, start_date = None, end_date = None):
+  def build_time_series_for_record(cls, r, data_dict, unit,
+                                    start_date = None, end_date = None,
+                                    sort = False):
     r_by_date = {}
     for d in data_dict:
       if r not in data_dict[d]:
@@ -98,4 +100,22 @@ class CsvData:
       if unit == '%':
         r_by_date[d] *= 100.0
     
+    if sort:
+      r_by_date = {d: v for d, v in sorted(r_by_date.items())}
+    
     return r_by_date
+
+  @classmethod
+  def build_time_deltas_for_record(cls, r, data_dict, unit, start_date = None, end_date = None):
+    r_by_date = cls.build_time_series_for_record(r, data_dict, unit,
+                                                  start_date, end_date,
+                                                  sort = True)
+
+    delta_by_date = {}
+    for d in r_by_date:
+      if not delta_by_date:
+        previous = r_by_date[d]
+      delta_by_date[d] = r_by_date[d] - previous
+      previous = r_by_date[d]
+    
+    return delta_by_date
