@@ -1,17 +1,30 @@
 import params as par
+from scipy import stats
 
 from graph import comparison
 from util import csvutil, dataio, paramutil, timeutil
 
+def get_correlations(vals1, vals2):
+  assert len(vals1) > 1
+  assert len(vals2) > 1
+
+  correlations = {}
+  corr_pvals = {}
+  pearson_corr = stats.pearsonr(vals1, vals2)
+  correlations[par.CorrelationType.PEARSON] = pearson_corr.statistic
+  corr_pvals[par.CorrelationType.PEARSON] = pearson_corr.pvalue
+  correlations[par.CorrelationType.SPEARMAN], corr_pvals[par.CorrelationType.SPEARMAN] = \
+      stats.spearmanr(vals1, vals2)
+  correlations[par.CorrelationType.KENDALL], corr_pvals[par.CorrelationType.KENDALL] = \
+      stats.kendalltau(vals1, vals2)
+
+  return correlations, corr_pvals
+
 def make_all_comparisons(data_dict, record_aggregation_types, record_units,
-                          period, period_delta = 0):
+                          period, period_delta, min_correlations):
   assert not record_aggregation_types.keys() ^ record_units.keys()
   
-  # record_types = record_aggregation_types.keys()
-  record_types = {par.Activity.ActiveEnergyBurned,
-                  par.Activity.AppleStandTime,
-                  par.Activity.DistanceWalkingRunning,
-                  par.Activity.StepCount}
+  record_types = record_aggregation_types.keys()
 
   all_r_to_dates = {}
   for r in record_types:
@@ -20,6 +33,7 @@ def make_all_comparisons(data_dict, record_aggregation_types, record_units,
 
   print()
   print(period.name)
+  all_corrs = {}
   for r1 in record_types:
     for r2 in record_types:
       if r1 == r2:
@@ -31,13 +45,16 @@ def make_all_comparisons(data_dict, record_aggregation_types, record_units,
       vals1 = []
       vals2 = []
       for d in r1_by_date:
-        r2d = timeutil.CalendarUtil.get_next_period_start_date(
-                  d, period = period, n = period_delta)
+        r2d = timeutil.CalendarUtil.get_next_period_start_date(d, period = period, n = period_delta)
         if r2d not in r2_by_date:
           continue
         vals1.append(r1_by_date[d])
         vals2.append(r2_by_date[r2d])
       assert len(vals1) == len(vals2)
+
+      corrs, copvals = get_correlations(vals1, vals2)
+      if not any(abs(corrs[m]) >= cut for m, cut in min_correlations.items()):
+        continue
 
       com = comparison.ComparisonGraph(tuple([vals1, vals2]),
                                         tuple([r1, r2]),
@@ -61,7 +78,8 @@ def record_comparison():
     data_dict = csvutil.CsvIO.read_data_csv(data_csv)
 
     make_all_comparisons(data_dict, record_aggregation_types, record_units,
-                          period = period, period_delta = par.RecordComparisonParams.PERIOD_DELTA)
+                          period = period, period_delta = par.RecordComparisonParams.PERIOD_DELTA,
+                          min_correlations = par.RecordComparisonParams.MIN_CORRELATIONS)
 
 if __name__ == '__main__':
   record_comparison()

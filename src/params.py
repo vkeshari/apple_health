@@ -119,10 +119,20 @@ class BucketTuningParams:
 
   NUM_RUNS = 20
 
+class CorrelationType(Enum):
+  PEARSON = 0
+  SPEARMAN = 1
+  KENDALL = 2
+
 class RecordComparisonParams:
+  # Does not support QUARTERLY, due to small no. of data points
   AGGREGATION_PERIODS = [AggregationPeriod.DAILY,
-                          AggregationPeriod.WEEKLY]
+                          AggregationPeriod.WEEKLY,
+                          AggregationPeriod.MONTHLY]
   PERIOD_DELTA = 0
+  MIN_CORRELATIONS = {CorrelationType.PEARSON: 0.8,
+                      CorrelationType.SPEARMAN: 0.8,
+                      CorrelationType.KENDALL: 0.8}
 
 
 # Record and Graph Configs
