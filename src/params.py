@@ -102,7 +102,7 @@ class GraphParams:
                           AggregationPeriod.MONTHLY,
                           AggregationPeriod.QUARTERLY]
 
-  HISTOGRAMS = False
+  HISTOGRAMS = True
   LINE_GRAPHS = True
 
 class BucketingType(Enum):
@@ -137,9 +137,9 @@ class RecordComparisonParams:
                           AggregationPeriod.WEEKLY,
                           AggregationPeriod.MONTHLY]
   
-  MAX_PERIOD_DELTAS = {AggregationPeriod.DAILY: 21,
-                        AggregationPeriod.WEEKLY: 12,
-                        AggregationPeriod.MONTHLY: 6}
+  MAX_PERIOD_DELTAS = {AggregationPeriod.DAILY: 15,
+                        AggregationPeriod.WEEKLY: 7,
+                        AggregationPeriod.MONTHLY: 4}
   
   MIN_CORRELATIONS = {CorrelationType.PEARSON: 0.8,
                       CorrelationType.SPEARMAN: 0.8,

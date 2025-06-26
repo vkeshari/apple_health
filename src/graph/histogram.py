@@ -73,13 +73,21 @@ class Histogram:
     plt.axvline(x = value, ymax = gmtp.get_y_current(),
                 color = color, linestyle = '--', alpha = 1.0)
     if annotate:
-      gmtp.plot_annotation(s = ("Avg: " + value_format).format(v = value), x = value)
+      gmtp.plot_annotation(
+          s = ("Avg: " + value_format).format(v = value),
+          x_position = common.GraphPosition.get_relative_position(value,
+                                                                  self.get_xmin(),
+                                                                  self.get_xmax()))
   
   def show_percentile(self, p, value, gmtp, value_format, color, annotate = False):
     plt.axvline(x = value, ymax = gmtp.get_y_current(),
                 color = color, linestyle = ':', alpha = 1.0)
     if annotate:
-      gmtp.plot_annotation(s = ("p{p}: " + value_format).format(p = p, v = value), x = value)
+      gmtp.plot_annotation(
+          s = ("p{p}: " + value_format).format(p = p, v = value),
+          x_position = common.GraphPosition.get_relative_position(value,
+                                                                  self.get_xmin(),
+                                                                  self.get_xmax()))
   
   def show_interval(self, ylim, color, x_low, x_high):
     self.ax.add_patch(Rectangle((x_low, 0), height = ylim, width = x_high - x_low,
@@ -108,7 +116,9 @@ class Histogram:
     
     y_positioner = common.YPositioner(y_start = 1.00 - self._text_spacing_factor,
                                       y_spacing = self._text_spacing_factor)
-    gmtp = common.GraphMultiTextPrinter(ylim = ylim, y_positioner = y_positioner,
+    gmtp = common.GraphMultiTextPrinter(xlims = [self.get_xmin(), self.get_xmax()],
+                                        ylims = [0, ylim],
+                                        y_positioner = y_positioner,
                                         horizontalalignment = 'left',
                                         verticalalignment = 'bottom')
     
@@ -132,8 +142,10 @@ class Histogram:
     
     y_positioner = common.YPositioner(y_start = 1.00 - self._text_spacing_factor,
                                       y_spacing = self._text_spacing_factor)
-    gmtp = common.GraphMultiTextPrinter(ylim = ylim, y_positioner = y_positioner,
-                                        x = 0.99 * xlim,
+    gmtp = common.GraphMultiTextPrinter(xlims = [self.get_xmin(), self.get_xmax()],
+                                        ylims = [0, ylim],
+                                        y_positioner = y_positioner,
+                                        x_position = 0.99,
                                         horizontalalignment = 'right',
                                         verticalalignment = 'bottom')
     

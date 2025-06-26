@@ -96,13 +96,26 @@ class YPositioner:
   def next(self):
     self.y_current -= self.y_spacing
 
+class GraphPosition:
+
+  @classmethod
+  def get_relative_position(cls, val, min, max):
+    return (val - min) / (max - min)
+  
+  @classmethod
+  def get_absolute_value(cls, pos, min, max):
+    return min + pos * (max - min)
+
 class GraphMultiTextPrinter:
 
-  def __init__(self, ylim, y_positioner, x = None,
+  def __init__(self, xlims, ylims, y_positioner, x_position = None,
                 horizontalalignment = 'center', verticalalignment = 'center'):
-    self.ylim = ylim
+    self.xlims = xlims
+    self.ylims = ylims
+
     self.y_positioner = y_positioner
-    self.x = x
+    self.x_position = x_position
+
     self.annotation_printer = AnnotationPrinter(horizontalalignment = horizontalalignment,
                                                 verticalalignment = verticalalignment)
   
@@ -110,7 +123,10 @@ class GraphMultiTextPrinter:
     return self.y_positioner.y_current
 
   def get_y_position(self):
-    return self.ylim * self.get_y_current()
+    return GraphPosition.get_absolute_value(self.get_y_current(), self.ylims[0], self.ylims[1])
+  
+  def get_x_position(self, x_position):
+    return GraphPosition.get_absolute_value(x_position, self.xlims[0], self.xlims[1])
   
   def newline(self):
     self.y_positioner.next()
@@ -119,13 +135,17 @@ class GraphMultiTextPrinter:
     for _ in range(n):
       self.newline()
   
-  def plot_annotation(self, s, x = None):
-    assert x or self.x
+  def plot_annotation(self, s, x_position = None):
+    assert x_position or self.x_position
 
-    if x:
-      self.annotation_printer.plot_annotation(x = x, y = self.get_y_position(), s = s)
-    elif self.x:
-      self.annotation_printer.plot_annotation(x = self.x, y = self.get_y_position(), s = s)
+    if x_position:
+      self.annotation_printer.plot_annotation(x = self.get_x_position(x_position),
+                                              y = self.get_y_position(),
+                                              s = s)
+    elif self.x_position:
+      self.annotation_printer.plot_annotation(x = self.get_x_position(self.x_position),
+                                              y = self.get_y_position(),
+                                              s = s)
     self.newline()
 
 @dataclass

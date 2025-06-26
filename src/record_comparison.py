@@ -39,7 +39,8 @@ def make_comparisons_with_period_delta(all_r_to_dates, record_aggregation_types,
                                         tuple([record_units[r1], record_units[r2]]),
                                         tuple([record_aggregation_types[r1],
                                                 record_aggregation_types[r2]]),
-                                        period, period_delta)
+                                        period, period_delta,
+                                        correlations = corrs)
       com.plot(show = False, save = True)
 
 def make_all_comparisons(data_dict, record_aggregation_types, record_units,

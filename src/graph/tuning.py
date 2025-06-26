@@ -91,7 +91,9 @@ class TuningGraph:
     
     plt.axvline(x = period_line, ymax = gmtp.get_y_current(),
                 linestyle = ':', linewidth = 2, color = 'gray', alpha = 0.8)
-    gmtp.plot_annotation(s = label, x = period_line)
+    gmtp.plot_annotation(
+        s = label,
+        x_position = common.GraphPosition.get_relative_position(period_line, 0, self.max_buckets))
 
   def show_value_guide(self, val, alpha = 0.5):
     plt.axhline(y = val, linestyle = '-', linewidth = 2, color = 'gray', alpha = alpha)
@@ -126,7 +128,9 @@ class TuningGraph:
     
     y_positioner = common.YPositioner(y_start = 1.00 - 2 * self._text_spacing_factor,
                                       y_spacing = self._text_spacing_factor)
-    gmtp = common.GraphMultiTextPrinter(ylim = self.ylim, y_positioner = y_positioner,
+    gmtp = common.GraphMultiTextPrinter(xlims = [0, self.max_buckets],
+                                        ylims = [0, self.ylim],
+                                        y_positioner = y_positioner,
                                         horizontalalignment = 'left',
                                         verticalalignment = 'bottom')
     
@@ -142,13 +146,14 @@ class TuningGraph:
 
     y_positioner = common.YPositioner(y_start = 1.00 - 2 * self._text_spacing_factor,
                                       y_spacing = self._text_spacing_factor)
-    gmtp = common.GraphMultiTextPrinter(ylim = self.ylim, y_positioner = y_positioner,
+    gmtp = common.GraphMultiTextPrinter(xlims = [0, self.max_buckets],
+                                        ylims = [0, self.ylim],
+                                        y_positioner = y_positioner,
+                                        x_position = 0.99,
                                         horizontalalignment = 'right',
                                         verticalalignment = 'bottom')
-    gmtp.plot_annotation(s = 'Data for {} days'.format(self.data_points),
-                          x = 0.99 * self.max_buckets)
-    gmtp.plot_annotation(s = 'Randomized runs: {}'.format(self.num_runs),
-                          x = 0.99 * self.max_buckets)
+    gmtp.plot_annotation(s = 'Data for {} days'.format(self.data_points))
+    gmtp.plot_annotation(s = 'Randomized runs: {}'.format(self.num_runs))
     
     self.ax.legend(handles = [out] + fill_betweens,
                     labels = ["Outliers"] \
