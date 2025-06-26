@@ -148,6 +148,16 @@ class GraphMultiTextPrinter:
                                               s = s)
     self.newline()
 
+class GraphBounds:
+
+  @classmethod
+  def get_bounds_with_padding(cls, data_series, percent_padding):
+    minval = min(data_series)
+    maxval = max(data_series)
+    diff = maxval - minval
+    padding = percent_padding * diff / 100.0
+    return minval - padding, maxval + padding
+
 @dataclass
 class GraphTickSpacing:
   upper_bound: float

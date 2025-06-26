@@ -97,6 +97,10 @@ class RecordGroups:
   @classmethod
   def get_slow_changing_record_types(cls):
     return par.SlowChanging.SLOW_CHANGING_RECORDS
+  
+  @classmethod
+  def get_highly_correlated_record_pairs(cls):
+    return par.HighlyCorrelated.HIGHLY_CORRELATED_RECORDS
 
 
 class RecordHistogramProperties:

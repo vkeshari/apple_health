@@ -34,6 +34,13 @@ class SlowChanging:
                            Activity.WalkingAsymmetryPercentage,
                            Activity.WalkingDoubleSupportPercentage}
 
+class HighlyCorrelated:
+  HIGHLY_CORRELATED_RECORDS = [{Activity.DistanceWalkingRunning, Activity.StepCount}]
+
+class ValueType(Enum):
+  RAW = 0
+  DELTA = 1
+
 
 # Script Configs
 
