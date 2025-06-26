@@ -6,7 +6,7 @@ from matplotlib.patches import Rectangle
 
 import params as par
 from . import common
-from util import dataio, paramutil, timeutil
+from util import dataio, datautil, paramutil, timeutil
 
 class Histogram:
   _resolution = tuple([7.2, 7.2])
@@ -93,9 +93,9 @@ class Histogram:
     xlim = self.get_xmax()
     stat_precision = self.get_text_precision()
 
-    data_stats = common.DataMetrics.get_stats(
-        data_series, include_percentiles = percentiles,
-        top_values = common.DataMetrics.get_top_values_count(self.period))
+    data_stats = datautil.DataSeriesMetrics.get_stats(
+                    data_series, include_percentiles = percentiles,
+                    top_values = common.GraphText.get_top_values_count(self.period))
     (mid50_low, mid50_high) = data_stats['middle_50']
     (mid80_low, mid80_high) = data_stats['middle_80']
     (mid90_low, mid90_high) = data_stats['middle_90']
@@ -161,7 +161,7 @@ class Histogram:
                                   .format(v1 = mid90_low, v2 = mid90_high))
     
     if show_top_values:
-      top_values_count = common.DataMetrics.get_top_values_count(self.period)
+      top_values_count = common.GraphText.get_top_values_count(self.period)
       gmtp.newline()
       gmtp.plot_annotation(s = "Top {} values".format(top_values_count))
       

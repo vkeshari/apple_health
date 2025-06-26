@@ -4,7 +4,7 @@ from pathlib import Path
 
 import params as par
 from . import common
-from util import dataio, timeutil
+from util import dataio, datautil, timeutil
 
 class TuningGraph:
   _resolution = tuple([10.8, 7.2])
@@ -48,7 +48,7 @@ class TuningGraph:
     self.min_buckets = min(self.buckets)
     self.max_buckets = max(self.buckets)
 
-    self.stats = {b: common.DataMetrics.get_stats(
+    self.stats = {b: datautil.DataSeriesMetrics.get_stats(
                         datasets[b],
                         include_percentiles = np.array(self._order_intervals).flatten()) \
                       for b in self.buckets}

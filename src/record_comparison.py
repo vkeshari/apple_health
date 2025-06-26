@@ -1,24 +1,7 @@
 import params as par
-from scipy import stats
 
 from graph import comparison
-from util import csvutil, dataio, paramutil, timeutil
-
-def get_correlations(vals1, vals2):
-  assert len(vals1) > 1
-  assert len(vals2) > 1
-
-  correlations = {}
-  corr_pvals = {}
-  pearson_corr = stats.pearsonr(vals1, vals2)
-  correlations[par.CorrelationType.PEARSON] = pearson_corr.statistic
-  corr_pvals[par.CorrelationType.PEARSON] = pearson_corr.pvalue
-  correlations[par.CorrelationType.SPEARMAN], corr_pvals[par.CorrelationType.SPEARMAN] = \
-      stats.spearmanr(vals1, vals2)
-  correlations[par.CorrelationType.KENDALL], corr_pvals[par.CorrelationType.KENDALL] = \
-      stats.kendalltau(vals1, vals2)
-
-  return correlations, corr_pvals
+from util import csvutil, dataio, datautil, paramutil, timeutil
 
 def make_all_comparisons(data_dict, record_aggregation_types, record_units,
                           period, period_delta, min_correlations):
@@ -52,7 +35,7 @@ def make_all_comparisons(data_dict, record_aggregation_types, record_units,
         vals2.append(r2_by_date[r2d])
       assert len(vals1) == len(vals2)
 
-      corrs, copvals = get_correlations(vals1, vals2)
+      corrs, _ = datautil.DataComparisonMetrics.get_correlations(vals1, vals2)
       if not any(abs(corrs[m]) >= cut for m, cut in min_correlations.items()):
         continue
 

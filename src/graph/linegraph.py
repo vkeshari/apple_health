@@ -5,7 +5,7 @@ from matplotlib.patches import Rectangle
 
 import params as par
 from . import common
-from util import dataio, paramutil, timeutil
+from util import dataio, datautil, paramutil, timeutil
 
 class LineGraph:
   _resolution = tuple([10.8, 7.2])
@@ -132,8 +132,8 @@ class LineGraph:
                 timeutil.CalendarUtil.get_next_period(d, period = self._show_intervals) - d
             all_percentiles = np.array(self._interval_percentiles).flatten()
             percentiles = \
-                common.DataMetrics.get_percentiles(interval_data[d],
-                                                    percentiles = all_percentiles)
+                datautil.DataSeriesMetrics.get_percentiles(interval_data[d],
+                                                            percentiles = all_percentiles)
             for p_low, p_high in self._interval_percentiles:
               self.plot_interval(d, patch_width,
                                   percentiles[p_low], percentiles[p_high],
