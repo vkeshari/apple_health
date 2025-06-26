@@ -63,9 +63,11 @@ class Validator:
 
     assert par.AggregationPeriod.QUARTERLY not in par.RecordComparisonParams.AGGREGATION_PERIODS
     assert all(0 <= pd for pd in par.RecordComparisonParams.MAX_PERIOD_DELTAS.values())
-    assert all(0 < c < 1 for c in par.RecordComparisonParams.MIN_CORRELATIONS.values())
-    assert all(0 < par.RecordComparisonParams.MIN_ACCEPTABLE_CORRELATION < c \
-                  for c in par.RecordComparisonParams.MIN_CORRELATIONS.values())
+    assert all(0 < c < 1 \
+                  for c in par.RecordComparisonParams.CORRELATION_CUTOFFS_BY_MEASURE.values())
+    assert all(0 < par.RecordComparisonParams.MIN_ACCEPTABLE_CORRELATION_FOR_ALL_MEASURES < c \
+                  for c in par.RecordComparisonParams.CORRELATION_CUTOFFS_BY_MEASURE.values())
+    assert 2 <= par.RecordComparisonParams.MIN_DATA_POINTS_FOR_CORRELATION
 
 
 class RecordProperties:
@@ -93,16 +95,29 @@ class RecordProperties:
 
     return record_to_text_precision
 
-
 class RecordGroups:
 
   @classmethod
   def get_slow_changing_record_types(cls):
     return par.SlowChanging.SLOW_CHANGING_RECORDS
+
+class RecordCorrelations:
+
+  @classmethod
+  def get_correlation_params(cls):
+    correlation_params = {
+        'correlation_cutoffs': par.RecordComparisonParams.CORRELATION_CUTOFFS_BY_MEASURE,
+        'min_acceptable_correlation': \
+            par.RecordComparisonParams.MIN_ACCEPTABLE_CORRELATION_FOR_ALL_MEASURES,
+        'min_datapoints': par.RecordComparisonParams.MIN_DATA_POINTS_FOR_CORRELATION}
+    return correlation_params
   
   @classmethod
-  def get_highly_correlated_record_pairs(cls):
-    return par.HighlyCorrelated.HIGHLY_CORRELATED_RECORDS
+  def is_highly_correlated_pair(cls, r1, r2):
+    for hcr in par.HighlyCorrelated.HIGHLY_CORRELATED_RECORDS:
+      if not {r1, r2} - hcr:
+        return True
+    return False
 
 
 class RecordHistogramProperties:

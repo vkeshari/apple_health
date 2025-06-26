@@ -144,14 +144,15 @@ class RecordComparisonParams:
                           AggregationPeriod.WEEKLY,
                           AggregationPeriod.MONTHLY]
   
-  MAX_PERIOD_DELTAS = {AggregationPeriod.DAILY: 8,
-                        AggregationPeriod.WEEKLY: 7,
-                        AggregationPeriod.MONTHLY: 4}
+  MAX_PERIOD_DELTAS = {AggregationPeriod.DAILY: 7,
+                        AggregationPeriod.WEEKLY: 6,
+                        AggregationPeriod.MONTHLY: 3}
   
-  MIN_CORRELATIONS = {CorrelationType.PEARSON: 0.75,
-                      CorrelationType.SPEARMAN: 0.75,
-                      CorrelationType.KENDALL: 0.75}
-  MIN_ACCEPTABLE_CORRELATION = 0.5
+  MIN_DATA_POINTS_FOR_CORRELATION = 25
+  MIN_ACCEPTABLE_CORRELATION_FOR_ALL_MEASURES = 0.5
+  CORRELATION_CUTOFFS_BY_MEASURE = {CorrelationType.PEARSON: 0.75,
+                                    CorrelationType.SPEARMAN: 0.75,
+                                    CorrelationType.KENDALL: 0.75}
 
 
 # Record and Graph Configs
