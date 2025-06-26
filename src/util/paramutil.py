@@ -64,6 +64,8 @@ class Validator:
     assert par.AggregationPeriod.QUARTERLY not in par.RecordComparisonParams.AGGREGATION_PERIODS
     assert all(0 <= pd for pd in par.RecordComparisonParams.MAX_PERIOD_DELTAS.values())
     assert all(0 < c < 1 for c in par.RecordComparisonParams.MIN_CORRELATIONS.values())
+    assert all(0 < par.RecordComparisonParams.MIN_ACCEPTABLE_CORRELATION < c \
+                  for c in par.RecordComparisonParams.MIN_CORRELATIONS.values())
 
 
 class RecordProperties:

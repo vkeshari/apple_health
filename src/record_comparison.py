@@ -6,13 +6,14 @@ from util import csvutil, dataio, datautil, paramutil, timeutil
 class RecordComparator:
 
   def __init__(self, record_type_pair, record_aggregation_type_pair, record_unit_pair,
-                period, period_delta, min_correlations):
+                period, period_delta, min_correlations, min_acceptable_correlation):
     self.record_type_pair = record_type_pair
     self.record_aggregation_type_pair = record_aggregation_type_pair
     self.record_unit_pair = record_unit_pair
     self.period = period
     self.period_delta = period_delta
     self.min_correlations = min_correlations
+    self.min_acceptable_correlation = min_acceptable_correlation
   
   def compare_and_graph_values(self, vals_by_date_1, vals_by_date_2, val_type_pair):
     vals1 = []
@@ -27,22 +28,22 @@ class RecordComparator:
     assert len(vals1) == len(vals2)
 
     corrs, _ = datautil.DataComparisonMetrics.get_correlations(vals1, vals2)
-    if not any(abs(corrs[m]) >= cut for m, cut in self.min_correlations.items()):
-      return
-
-    com = comparison.ComparisonGraph(tuple([vals1, vals2]),
-                                      self.record_type_pair,
-                                      self.record_unit_pair,
-                                      self.record_aggregation_type_pair,
-                                      val_type_pair,
-                                      self.period, self.period_delta,
-                                      correlations = corrs)
-    com.plot(show = False, save = True)
+    if any(abs(corrs[m]) >= cut for m, cut in self.min_correlations.items()) \
+        and all(abs(c) >= self.min_acceptable_correlation for c in corrs.values()):
+      com = comparison.ComparisonGraph(tuple([vals1, vals2]),
+                                        self.record_type_pair,
+                                        self.record_unit_pair,
+                                        self.record_aggregation_type_pair,
+                                        val_type_pair,
+                                        self.period, self.period_delta,
+                                        correlations = corrs)
+      com.plot(show = False, save = True)
 
 
 def make_comparisons_with_period_delta(all_values_by_date, all_deltas_by_date,
                                         record_aggregation_types, record_units,
-                                        period, period_delta, min_correlations):
+                                        period, period_delta,
+                                        min_correlations, min_acceptable_correlation):
 
   print()
   print("{}\t+{}".format(period.name, period_delta))
@@ -60,7 +61,8 @@ def make_comparisons_with_period_delta(all_values_by_date, all_deltas_by_date,
                                             record_aggregation_types[r2]])
       record_unit_pair = tuple([record_units[r1], record_units[r2]])
       comparator = RecordComparator(record_type_pair, record_aggregation_type_pair,
-                                    record_unit_pair, period, period_delta, min_correlations)
+                                    record_unit_pair, period, period_delta,
+                                    min_correlations, min_acceptable_correlation)
 
       r1_vals_by_date = all_values_by_date[r1]
       r2_vals_by_date = all_values_by_date[r2]
@@ -79,7 +81,7 @@ def make_comparisons_with_period_delta(all_values_by_date, all_deltas_by_date,
 
 
 def make_all_comparisons(data_dict, record_aggregation_types, record_units,
-                          period, max_period_delta, min_correlations):
+                          period, max_period_delta, min_correlations, min_acceptable_correlation):
   assert not record_aggregation_types.keys() ^ record_units.keys()
   
   record_types = record_aggregation_types.keys()
@@ -95,7 +97,7 @@ def make_all_comparisons(data_dict, record_aggregation_types, record_units,
   for pd in range(max_period_delta):
     make_comparisons_with_period_delta(all_values_by_date, all_deltas_by_date,
                                         record_aggregation_types, record_units,
-                                        period, pd, min_correlations)
+                                        period, pd, min_correlations, min_acceptable_correlation)
 
 
 def record_comparison():
@@ -110,10 +112,11 @@ def record_comparison():
     data_csv = dio.get_csv_file(period = period)
     data_dict = csvutil.CsvIO.read_data_csv(data_csv)
 
-    make_all_comparisons(data_dict, record_aggregation_types, record_units,
-                          period = period,
-                          max_period_delta = par.RecordComparisonParams.MAX_PERIOD_DELTAS[period],
-                          min_correlations = par.RecordComparisonParams.MIN_CORRELATIONS)
+    make_all_comparisons(
+        data_dict, record_aggregation_types, record_units, period = period,
+        max_period_delta = par.RecordComparisonParams.MAX_PERIOD_DELTAS[period],
+        min_correlations = par.RecordComparisonParams.MIN_CORRELATIONS,
+        min_acceptable_correlation = par.RecordComparisonParams.MIN_ACCEPTABLE_CORRELATION)
 
 if __name__ == '__main__':
   record_comparison()
