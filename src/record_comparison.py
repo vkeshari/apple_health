@@ -10,9 +10,11 @@ def make_comparisons_with_period_delta(all_r_to_dates, record_aggregation_types,
   print("{}\t+{}".format(period.name, period_delta))
 
   record_types = all_r_to_dates.keys()
+  slow_changing_records = paramutil.RecordGroups.get_slow_changing_record_types()
+
   for r1 in record_types:
     for r2 in record_types:
-      if r1 == r2:
+      if r1 == r2 and (period_delta == 0 or r1 in slow_changing_records):
         continue
 
       r1_by_date = all_r_to_dates[r1]

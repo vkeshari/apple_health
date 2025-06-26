@@ -92,6 +92,13 @@ class RecordProperties:
     return record_to_text_precision
 
 
+class RecordGroups:
+
+  @classmethod
+  def get_slow_changing_record_types(cls):
+    return par.SlowChanging.SLOW_CHANGING_RECORDS
+
+
 class RecordHistogramProperties:
 
   @classmethod
@@ -122,3 +129,4 @@ class RecordLineGraphProperties:
       record_to_ymax[record_type] = rlgp.ymax
     
     return record_to_ymin, record_to_ymax
+  

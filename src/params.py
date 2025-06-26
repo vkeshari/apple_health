@@ -27,6 +27,13 @@ class Activity(Enum):
   WalkingDoubleSupportPercentage = 17
   WalkingSpeed = 18
 
+class SlowChanging:
+  SLOW_CHANGING_RECORDS = {Activity.BodyMass,
+                           Activity.HeartRateRecoveryOneMinute,
+                           Activity.VO2Max,
+                           Activity.WalkingAsymmetryPercentage,
+                           Activity.WalkingDoubleSupportPercentage}
+
 
 # Script Configs
 
@@ -130,9 +137,9 @@ class RecordComparisonParams:
                           AggregationPeriod.WEEKLY,
                           AggregationPeriod.MONTHLY]
   
-  MAX_PERIOD_DELTAS = {AggregationPeriod.DAILY: 14,
-                        AggregationPeriod.WEEKLY: 6,
-                        AggregationPeriod.MONTHLY: 3}
+  MAX_PERIOD_DELTAS = {AggregationPeriod.DAILY: 21,
+                        AggregationPeriod.WEEKLY: 12,
+                        AggregationPeriod.MONTHLY: 6}
   
   MIN_CORRELATIONS = {CorrelationType.PEARSON: 0.8,
                       CorrelationType.SPEARMAN: 0.8,
