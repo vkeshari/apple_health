@@ -150,9 +150,12 @@ class RecordComparisonParams:
   
   MIN_DATA_POINTS_FOR_CORRELATION = 25
   MIN_ACCEPTABLE_CORRELATION_FOR_ALL_MEASURES = 0.5
-  CORRELATION_CUTOFFS_BY_MEASURE = {CorrelationType.PEARSON: 0.75,
-                                    CorrelationType.SPEARMAN: 0.75,
-                                    CorrelationType.KENDALL: 0.75}
+  CORRELATION_CUTOFFS_BY_MEASURE = {CorrelationType.PEARSON: 0.6,
+                                    CorrelationType.SPEARMAN: 0.6,
+                                    CorrelationType.KENDALL: 0.6}
+  
+  # Ignore StepCount since it is highly correlated with DistanceWalkingRunning
+  IGNORE_ACTIVITIES = [Activity.StepCount]
 
 
 # Record and Graph Configs

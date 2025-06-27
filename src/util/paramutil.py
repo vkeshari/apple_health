@@ -98,8 +98,8 @@ class RecordProperties:
 class RecordGroups:
 
   @classmethod
-  def get_slow_changing_record_types(cls):
-    return par.SlowChanging.SLOW_CHANGING_RECORDS
+  def is_slow_changing_record_type(cls, r):
+    return r in par.SlowChanging.SLOW_CHANGING_RECORDS
 
 class RecordCorrelations:
 
@@ -118,6 +118,10 @@ class RecordCorrelations:
       if not {r1, r2} - hcr:
         return True
     return False
+  
+  @classmethod
+  def is_ignored_activity(cls, r):
+    return r in par.RecordComparisonParams.IGNORE_ACTIVITIES
 
 
 class RecordHistogramProperties:

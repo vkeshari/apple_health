@@ -29,11 +29,11 @@ class RecordComparator:
       vals1.append(vals_by_date_1[d])
       vals2.append(vals_by_date_2[r2d])
     assert len(vals1) == len(vals2)
-    
+
     if len(vals1) < self.min_datapoints:
       return
 
-    corrs, _ = datautil.DataComparisonMetrics.get_correlations(vals1, vals2)
+    corrs, corr_pvals = datautil.DataComparisonMetrics.get_correlations(vals1, vals2)
     any_correlation_above_cutoff = \
         any(abs(corrs[m]) >= cut for m, cut in self.correlation_cutoffs.items())
     all_correlations_above_minimum_acceptable_value = \
@@ -47,7 +47,8 @@ class RecordComparator:
                                       self.record_aggregation_type_pair,
                                       val_type_pair,
                                       self.period, self.period_delta,
-                                      correlations = corrs)
+                                      correlations = corrs,
+                                      correlation_pvals = corr_pvals)
     com.plot(show = False, save = True)
 
 
@@ -60,10 +61,15 @@ def make_comparisons_with_period_delta(all_values_by_date, all_deltas_by_date,
 
   record_types = all_values_by_date.keys()
 
+  seen_same_period_pairs = []
   for r1 in record_types:
     for r2 in record_types:
-      if r1 == r2 or paramutil.RecordCorrelations.is_highly_correlated_pair(r1, r2):
+      if r1 == r2 or any(paramutil.RecordCorrelations.is_ignored_activity(r) for r in [r1, r2]):
         continue
+      if period_delta == 0:
+        if {r1, r2} in seen_same_period_pairs:
+          continue
+        seen_same_period_pairs.append({r1, r2})
 
       record_type_pair = tuple([r1, r2])
       record_aggregation_type_pair = tuple([record_aggregation_types[r1],

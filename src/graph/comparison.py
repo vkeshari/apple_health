@@ -16,9 +16,10 @@ class ComparisonGraph:
                         par.AggregationPeriod.WEEKLY: 0.3,
                         par.AggregationPeriod.MONTHLY: 0.5}
   _axis_percent_padding = 20
+  _plot_pvals = False
 
   def __init__(self, xy_vals, record_types, record_units, record_aggregation_types,
-                record_val_types, period, period_delta, correlations):
+                record_val_types, period, period_delta, correlations, correlation_pvals):
     self.record_type_y = record_types[0]
     self.record_type_x = record_types[1]
 
@@ -45,6 +46,7 @@ class ComparisonGraph:
     self.period_delta = period_delta
 
     self.correlations = correlations
+    self.correlation_pvals = correlation_pvals
 
     self.fig, self.ax = plt.subplots(figsize = self._resolution)
     self.init_plot()
@@ -132,9 +134,14 @@ class ComparisonGraph:
                                         verticalalignment = 'bottom')
     gmtp.plot_annotation(s = "Total Points: {}".format(self.total_points))
     gmtp.newline()
-    gmtp.plot_annotation(s = "Correlations:")
+    gmtp.plot_annotation(s = "Correlations")
     for m in self.correlations:
       gmtp.plot_annotation(s = "{}: {:.2f}".format(m.name, self.correlations[m]))
+    if self._plot_pvals:
+      gmtp.newline()
+      gmtp.plot_annotation(s = "Correlation P-Vals")
+      for m in self.correlations:
+        gmtp.plot_annotation(s = "{}: {:.2f}".format(m.name, self.correlation_pvals[m]))
 
     if save:
       x_filename_chunk, y_filename_chunk = self.get_record_filename_chunks()
