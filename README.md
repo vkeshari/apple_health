@@ -12,8 +12,9 @@ exported by Apple Health.
 
 ## Prerequisites
 Data exported from Apple Health contains a file named `export.xml`.
-* Save this file under `data/raw`, renaming if necessary.
-* Set `params.ParserParams.INPUT_FILENAME` to the file's name, exclusing directory path.
+* Save this file under `data/raw`.
+* Set `params.ParserParams.INPUT_FILENAME` to the file's name (renaming if necessary),
+  excluding directory path.
 * Set `params.DataParams` as per your requirements.
 * Run the scripts below.
 
@@ -44,10 +45,14 @@ See `params.py`
   * Configure using `params.AggregatorParams`
   * All aggregations are averages of daily values from `parse_data.py`.
 
-Output files will be saved under `data/processed`.
+Output files from all data processing scripts will be saved under `data/processed`.
 These files will be used by all analysis scripts below.
 
 ## Data Analysis
+> [!NOTE]
+> All graphs types will be saved under their respective directories, in subdirectories named
+> for the timestamp when the data analysis script was run.
+
 * `build_graphs.py`: Saves line graphs and histograms for each record type.
   * Configure using `params.GraphParams`
   * Line graphs are saved in `out/line`
@@ -77,7 +82,7 @@ These files will be used by all analysis scripts below.
 > This script runs in multiple processes. The output graphs might be in different folders
 > with adjacent timestamps.
 
-* `distribution_fit.py`: Checks what distribution(s) can fit data for given record-type.
+* `distribution_fit.py`: Checks what distribution(s) can fit data for given record types.
   * Configure using `params.DistributionFitParams`
 
 > [!WARNING]
