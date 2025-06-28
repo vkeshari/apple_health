@@ -1,5 +1,5 @@
 import params as par
-from util import csvutil, dataio, datautil, paramutil, timeutil
+from util import csvutil, dataio, datautil, paramutil
 
 def fit_distribution(data_dict, record_aggregation_types, record_units, period,
                       record_types, num_best_fits):
