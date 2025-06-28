@@ -95,8 +95,8 @@ class AggregationPeriod(Enum):
 class AggregatorParams:
   # Does not support DAILY, by definition
   AGGREGATION_PERIODS = [AggregationPeriod.WEEKLY,
-                        AggregationPeriod.MONTHLY,
-                        AggregationPeriod.QUARTERLY]
+                          AggregationPeriod.MONTHLY,
+                          AggregationPeriod.QUARTERLY]
   
   WRITE_DATA = True
 
@@ -155,7 +155,16 @@ class RecordComparisonParams:
                                     CorrelationType.KENDALL: 0.6}
   
   # Ignore StepCount since it is highly correlated with DistanceWalkingRunning
-  IGNORE_ACTIVITIES = [Activity.StepCount]
+  IGNORE_ACTIVITIES = {Activity.StepCount}
+
+class DistributionFitParams:
+  # Does not support QUARTERLY, due to small no. of data points
+  AGGREGATION_PERIODS = [AggregationPeriod.DAILY]
+
+  NUM_BEST_FITS = 20
+  ACTIVITIES = {Activity.ActiveEnergyBurned,
+                Activity.AppleStandTime,
+                Activity.DistanceWalkingRunning}
 
 
 # Record and Graph Configs

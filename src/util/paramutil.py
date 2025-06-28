@@ -69,6 +69,13 @@ class Validator:
                   for c in par.RecordComparisonParams.CORRELATION_CUTOFFS_BY_MEASURE.values())
     assert 2 <= par.RecordComparisonParams.MIN_DATA_POINTS_FOR_CORRELATION
 
+  @classmethod
+  def validate_distribution_fit(cls):
+    cls.validate_data_params()
+
+    assert par.AggregationPeriod.QUARTERLY not in par.DistributionFitParams.AGGREGATION_PERIODS
+    assert 0 < par.DistributionFitParams.NUM_BEST_FITS
+
 
 class RecordProperties:
 

@@ -1,4 +1,5 @@
 import numpy as np
+from fitter import Fitter
 from scipy import stats
 
 import params as par
@@ -66,6 +67,12 @@ class DataSeriesMetrics:
     std = cls.get_std(data_series)
 
     return av - nsigma * std, av + nsigma * std
+  
+  @classmethod
+  def get_best_fit(cls, data_series, num_best_fits = 10):
+    f = Fitter(data_series)
+    f.fit()
+    return f.summary(Nbest = num_best_fits)
 
 
 class DataComparisonMetrics:

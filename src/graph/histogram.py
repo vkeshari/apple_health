@@ -98,7 +98,6 @@ class Histogram:
                   show_percentiles = False, annotate_percentiles = False,
                   show_normal_stats = False, show_order_stats = False,
                   show_top_values = False, show_intervals = False):
-    xlim = self.get_xmax()
     stat_precision = self.get_text_precision()
 
     data_stats = datautil.DataSeriesMetrics.get_stats(
