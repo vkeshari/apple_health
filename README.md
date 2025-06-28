@@ -1,7 +1,8 @@
 # apple_health
 
 > [!IMPORTANT]
-> You may use the code in this repository for your own analysis of cricket ratings data, but **you must attribute references to this or any derivative work to the original author**.
+> You may use the code in this repository for your own analysis of apple health data,
+> but **you must attribute references to this or any derivative work to the original author**.
 
 The Apple Health library can processes, aggregate, compare and visualize fitness data
 exported by Apple Health.
@@ -24,10 +25,12 @@ See `params.py`
   > and then the respective average or median is calculated on those hourly averages
   > to get daily data.
 
+* `params.DataParams`: Configures which CSV files to use for data analysis.
 > [!NOTE]
 > All scripts use the same `params.DataParams` to locate CSV files containing parsed data.
 >
-> Use `params.DataParams.SUFFIX` to create multiple aggregations from the same data.
+> Use `params.DataParams.SUFFIX` to create multiple aggregations from the same raw XML data.
+> Suffixes should be of the form `_XYZNAME`.
 
 ## Data Processing
 * `parse_data.py`: Parses raw XML data into a CSV file containing daily aggregates for all data.
