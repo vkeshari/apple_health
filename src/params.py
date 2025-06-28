@@ -35,7 +35,8 @@ class SlowChanging:
                            Activity.WalkingDoubleSupportPercentage}
 
 class HighlyCorrelated:
-  HIGHLY_CORRELATED_RECORDS = [{Activity.DistanceWalkingRunning, Activity.StepCount}]
+  HIGHLY_CORRELATED_RECORDS = [{Activity.DistanceWalkingRunning, Activity.StepCount},
+                                {Activity.BodyMass, Activity.HeartRateRecoveryOneMinute}]
 
 class ValueType(Enum):
   RAW = 0
@@ -139,20 +140,20 @@ class CorrelationType(Enum):
   KENDALL = 2
 
 class RecordComparisonParams:
-  # Does not support QUARTERLY, due to small no. of data points
+  # Does not support MONTHLY or QUARTERLY, due to small no. of data points
   AGGREGATION_PERIODS = [AggregationPeriod.DAILY,
-                          AggregationPeriod.WEEKLY,
-                          AggregationPeriod.MONTHLY]
+                          AggregationPeriod.WEEKLY]
   
-  MAX_PERIOD_DELTAS = {AggregationPeriod.DAILY: 7,
-                        AggregationPeriod.WEEKLY: 6,
-                        AggregationPeriod.MONTHLY: 3}
+  MAX_PERIOD_DELTAS = {AggregationPeriod.DAILY: 14,
+                        AggregationPeriod.WEEKLY: 6}
   
   MIN_DATA_POINTS_FOR_CORRELATION = 25
-  MIN_ACCEPTABLE_CORRELATION_FOR_ALL_MEASURES = 0.5
-  CORRELATION_CUTOFFS_BY_MEASURE = {CorrelationType.PEARSON: 0.6,
-                                    CorrelationType.SPEARMAN: 0.6,
-                                    CorrelationType.KENDALL: 0.6}
+  MIN_ACCEPTABLE_CORRELATION_FOR_ALL_MEASURES = 0.25
+  CORRELATION_CUTOFFS_BY_MEASURE = {CorrelationType.PEARSON: 0.5,
+                                    CorrelationType.SPEARMAN: 0.5,
+                                    CorrelationType.KENDALL: 0.5}
+  
+  FIT_LINE = True
   
   # Ignore StepCount since it is highly correlated with DistanceWalkingRunning
   IGNORE_ACTIVITIES = {Activity.StepCount}

@@ -69,9 +69,13 @@ These files will be used by all analysis scripts below.
   that show high correlation. It will compare both raw and delta values of records
   in the same period and in offset periods.
   > For example, it can compare weekly StepCount values to weekly changes (deltas) in
-    RestingHeartRate values two weeks later.
+  > RestingHeartRate values two weeks later.
   * Configure using `params.RecordComparisonParams`
   * Scatter plots are saved in `out/comparison`
+
+> [!NOTE]
+> This script runs in multiple processes. The output graphs might be in different folders
+> with adjacent timestamps.
 
 * `distribution_fit.py`: Checks what distribution(s) can fit data for given record-type.
   * Configure using `params.DistributionFitParams`

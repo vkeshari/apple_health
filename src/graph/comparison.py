@@ -1,6 +1,7 @@
 import numpy as np
 from pathlib import Path
 from matplotlib import pyplot as plt
+from scipy.optimize import curve_fit
 
 import params as par
 from . import common
@@ -17,29 +18,34 @@ class ComparisonGraph:
                         par.AggregationPeriod.MONTHLY: 0.5}
   _axis_percent_padding = 20
   _plot_pvals = False
+  _fit_line = par.RecordComparisonParams.FIT_LINE
+
+  @classmethod
+  def line_fn(cls, x, m, c):
+    return m * x + c
 
   def __init__(self, xy_vals, record_types, record_units, record_aggregation_types,
                 record_val_types, period, period_delta, correlations, correlation_pvals):
-    self.record_type_y = record_types[0]
-    self.record_type_x = record_types[1]
+    self.record_type_x = record_types[0]
+    self.record_type_y = record_types[1]
 
-    self.record_unit_y = record_units[0]
-    self.record_unit_x = record_units[1]
+    self.record_unit_x = record_units[0]
+    self.record_unit_y = record_units[1]
 
-    self.record_aggregation_type_y = record_aggregation_types[0]
-    self.record_aggregation_type_x = record_aggregation_types[1]
+    self.record_aggregation_type_x = record_aggregation_types[0]
+    self.record_aggregation_type_y = record_aggregation_types[1]
 
-    self.record_val_type_y = record_val_types[0]
-    self.record_val_type_x = record_val_types[1]
+    self.record_val_type_x = record_val_types[0]
+    self.record_val_type_y = record_val_types[1]
 
     assert len(xy_vals[0]) == len(xy_vals[1])
     self.total_points = len(xy_vals[0])
-    self.y_vals = xy_vals[0]
-    self.x_vals = xy_vals[1]
+    self.x_vals = xy_vals[0]
+    self.y_vals = xy_vals[1]
 
-    self.y_bounds = common.GraphBounds.get_bounds_with_padding(self.y_vals,
-                                                                self._axis_percent_padding)
     self.x_bounds = common.GraphBounds.get_bounds_with_padding(self.x_vals,
+                                                                self._axis_percent_padding)
+    self.y_bounds = common.GraphBounds.get_bounds_with_padding(self.y_vals,
                                                                 self._axis_percent_padding)
 
     self.period = period
@@ -99,7 +105,7 @@ class ComparisonGraph:
 
     x_label, y_label = self.get_record_names()
     if self.period_delta > 0:
-      x_label += " ({} {} later)".format(self.period_delta,
+      y_label += " ({} {} later)".format(self.period_delta,
                                           common.GraphText.get_period_text(self.period))
     
     self.ax.set_xlabel(x_label)
@@ -142,6 +148,13 @@ class ComparisonGraph:
       gmtp.plot_annotation(s = "Correlation P-Vals")
       for m in self.correlations:
         gmtp.plot_annotation(s = "{}: {:.2f}".format(m.name, self.correlation_pvals[m]))
+    
+    if self._fit_line:
+      (m, c), _ = curve_fit(self.line_fn, self.x_vals, self.y_vals)
+      self.ax.plot(self.x_bounds, [self.line_fn(x, m, c) for x in self.x_bounds],
+                    color = 'tab:blue', linewidth = 5, alpha = 0.5)
+      gmtp.newline()
+      gmtp.plot_annotation(s = "Fit Line Slope: {:.2f}".format(m))
 
     if save:
       x_filename_chunk, y_filename_chunk = self.get_record_filename_chunks()

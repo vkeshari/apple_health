@@ -61,13 +61,18 @@ class Validator:
   def validate_record_comparison(cls):
     cls.validate_data_params()
 
+    assert par.AggregationPeriod.MONTHLY not in par.RecordComparisonParams.AGGREGATION_PERIODS
     assert par.AggregationPeriod.QUARTERLY not in par.RecordComparisonParams.AGGREGATION_PERIODS
+
     assert all(0 <= pd for pd in par.RecordComparisonParams.MAX_PERIOD_DELTAS.values())
+    assert not set(par.RecordComparisonParams.AGGREGATION_PERIODS) \
+                  ^ par.RecordComparisonParams.MAX_PERIOD_DELTAS.keys()
+
+    assert 2 <= par.RecordComparisonParams.MIN_DATA_POINTS_FOR_CORRELATION
     assert all(0 < c < 1 \
                   for c in par.RecordComparisonParams.CORRELATION_CUTOFFS_BY_MEASURE.values())
     assert all(0 < par.RecordComparisonParams.MIN_ACCEPTABLE_CORRELATION_FOR_ALL_MEASURES < c \
                   for c in par.RecordComparisonParams.CORRELATION_CUTOFFS_BY_MEASURE.values())
-    assert 2 <= par.RecordComparisonParams.MIN_DATA_POINTS_FOR_CORRELATION
 
   @classmethod
   def validate_distribution_fit(cls):

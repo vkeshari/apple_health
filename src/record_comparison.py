@@ -1,5 +1,6 @@
 import params as par
 
+from concurrent.futures import ProcessPoolExecutor, wait
 from graph import comparison
 from util import csvutil, dataio, datautil, paramutil, timeutil
 
@@ -56,7 +57,6 @@ def make_comparisons_with_period_delta(all_values_by_date, all_deltas_by_date,
                                         record_aggregation_types, record_units,
                                         period, period_delta, correlation_params):
 
-  print()
   print("{}\t+{}".format(period.name, period_delta))
 
   record_types = all_values_by_date.keys()
@@ -64,7 +64,9 @@ def make_comparisons_with_period_delta(all_values_by_date, all_deltas_by_date,
   seen_same_period_pairs = []
   for r1 in record_types:
     for r2 in record_types:
-      if r1 == r2 or any(paramutil.RecordCorrelations.is_ignored_activity(r) for r in [r1, r2]):
+      if r1 == r2 \
+          or any(paramutil.RecordCorrelations.is_ignored_activity(r) for r in [r1, r2]) \
+          or paramutil.RecordCorrelations.is_highly_correlated_pair(r1, r2):
         continue
       if period_delta == 0:
         if {r1, r2} in seen_same_period_pairs:
@@ -93,7 +95,7 @@ def make_comparisons_with_period_delta(all_values_by_date, all_deltas_by_date,
         comparator.compare_and_graph_values(r1_deltas_by_date, r2_deltas_by_date,
                                             tuple([par.ValueType.DELTA, par.ValueType.DELTA]))
 
-def make_all_comparisons(data_dict, record_aggregation_types, record_units, period,
+def make_all_comparisons(executor, data_dict, record_aggregation_types, record_units, period,
                           max_period_delta, correlation_params):
   assert not record_aggregation_types.keys() ^ record_units.keys()
   
@@ -107,10 +109,13 @@ def make_all_comparisons(data_dict, record_aggregation_types, record_units, peri
     all_deltas_by_date[r] = csvutil.CsvData.build_time_deltas_for_record(
                                 r, data_dict, unit = record_units[r])
   
+  pd_futs = []
   for pd in range(max_period_delta + 1):
-    make_comparisons_with_period_delta(all_values_by_date, all_deltas_by_date,
-                                        record_aggregation_types, record_units,
-                                        period, pd, correlation_params)
+    pd_futs.append(executor.submit(make_comparisons_with_period_delta,
+                                    all_values_by_date, all_deltas_by_date,
+                                    record_aggregation_types, record_units,
+                                    period, pd, correlation_params))
+  return pd_futs
 
 
 def record_comparison():
@@ -121,16 +126,20 @@ def record_comparison():
 
   dio = dataio.DataIO(par.DataParams)
 
-  for period in par.RecordComparisonParams.AGGREGATION_PERIODS:
-    data_csv = dio.get_csv_file(period = period)
-    data_dict = csvutil.CsvIO.read_data_csv(data_csv)
+  with ProcessPoolExecutor() as executor:
+    all_pd_futs = []
+    for period in par.RecordComparisonParams.AGGREGATION_PERIODS:
+      data_csv = dio.get_csv_file(period = period)
+      data_dict = csvutil.CsvIO.read_data_csv(data_csv)
 
-    correlation_params = paramutil.RecordCorrelations.get_correlation_params()
+      correlation_params = paramutil.RecordCorrelations.get_correlation_params()
 
-    make_all_comparisons(
-        data_dict, record_aggregation_types, record_units, period = period,
-        max_period_delta = par.RecordComparisonParams.MAX_PERIOD_DELTAS[period],
-        correlation_params = correlation_params)
+      pd_futs = make_all_comparisons(executor,
+                    data_dict, record_aggregation_types, record_units, period = period,
+                    max_period_delta = par.RecordComparisonParams.MAX_PERIOD_DELTAS[period],
+                    correlation_params = correlation_params)
+      all_pd_futs += pd_futs
+    wait(all_pd_futs)
 
 if __name__ == '__main__':
   record_comparison()
