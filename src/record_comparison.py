@@ -68,6 +68,9 @@ def make_comparisons_with_period_delta(all_values_by_date, all_deltas_by_date,
           or any(paramutil.RecordCorrelations.is_ignored_activity(r) for r in [r1, r2]) \
           or paramutil.RecordCorrelations.is_highly_correlated_pair(r1, r2):
         continue
+      if r1 == par.Activity.ActiveEnergyBurned:
+        r1, r2 = r2, r1
+      
       if period_delta == 0:
         if {r1, r2} in seen_same_period_pairs:
           continue
