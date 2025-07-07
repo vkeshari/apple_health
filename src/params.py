@@ -167,6 +167,19 @@ class DistributionFitParams:
                 Activity.AppleStandTime,
                 Activity.DistanceWalkingRunning}
 
+class ClusteringParams:
+  # Does not support QUARTERLY, due to small no. of data points
+  AGGREGATION_PERIODS = [AggregationPeriod.DAILY,
+                          AggregationPeriod.WEEKLY,
+                          AggregationPeriod.MONTHLY]
+
+  ACTIVITIES = {Activity.ActiveEnergyBurned,
+                Activity.AppleStandTime,
+                Activity.DistanceWalkingRunning,
+                Activity.HeartRate,
+                Activity.RestingHeartRate}
+  GROUP_BY_ACTIVITY = Activity.ActiveEnergyBurned
+
 
 # Record and Graph Configs
 

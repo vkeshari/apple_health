@@ -81,6 +81,13 @@ class Validator:
     assert par.AggregationPeriod.QUARTERLY not in par.DistributionFitParams.AGGREGATION_PERIODS
     assert 0 < par.DistributionFitParams.NUM_BEST_FITS
 
+  @classmethod
+  def validate_run_clustering(cls):
+    cls.validate_data_params()
+
+    assert par.AggregationPeriod.QUARTERLY not in par.ClusteringParams.AGGREGATION_PERIODS
+    assert par.ClusteringParams.GROUP_BY_ACTIVITY in par.ClusteringParams.ACTIVITIES
+
 
 class RecordProperties:
 

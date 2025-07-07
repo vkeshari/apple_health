@@ -52,7 +52,6 @@ class RecordComparator:
                                       correlation_pvals = corr_pvals)
     com.plot(show = False, save = True)
 
-
 def make_comparisons_with_period_delta(all_values_by_date, all_deltas_by_date,
                                         record_aggregation_types, record_units,
                                         period, period_delta, correlation_params):

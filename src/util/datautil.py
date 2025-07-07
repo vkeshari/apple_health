@@ -94,3 +94,18 @@ class DataComparisonMetrics:
         stats.kendalltau(vals1, vals2)
 
     return correlations, corr_pvals
+
+
+class Rescaler:
+
+  def __init__(self, data):
+    self.average = np.average(list(data))
+  
+  def rescale(self, val):
+    return (val - self.average) / self.average
+  
+  def rescale_all(self, vals):
+    return [self.rescale(v) for v in vals]
+  
+  def backscale(self, val):
+    return (1 + val) * self.average
