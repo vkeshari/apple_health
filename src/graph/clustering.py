@@ -21,7 +21,7 @@ class ClusteringGraph:
   _fit_line = par.RecordComparisonParams.FIT_LINE
   _colors = list(mcolors.TABLEAU_COLORS.keys())
 
-  def __init__(self, xy_vals, dates, groups, record_types, group_by_record, period):
+  def __init__(self, xy_vals, dates, groups, record_types, group_by_record, record_unit, period):
     self.total_points = len(xy_vals)
     self.x_vals = xy_vals[ : , 0]
     self.y_vals = xy_vals[ : , 1]
@@ -43,14 +43,17 @@ class ClusteringGraph:
     assert group_by_record in self.record_types
     self.group_by_record = group_by_record
 
+    self.record_unit = record_unit
     self.period = period
 
     self.fig, self.ax = plt.subplots(figsize = self._resolution)
     self.init_plot()
 
   def get_graph_title(self):
-    title_1 = "Dimensionailty Reduction"
-    title_2 = "Grouped by {}".format(self.group_by_record.name)
+    period_text = common.GraphText.pretty_enum(self.period, capitalize = True)
+    title_1 = "Dimensionailty Reduction on {} data".format(period_text)
+    title_2 = "Grouped by {} ({})".format(self.group_by_record.name, self.record_unit)
+
     return title_1 + '\n' + title_2
   
   def init_plot(self):
@@ -86,13 +89,15 @@ class ClusteringGraph:
       scatters.append(s)
     
     group_id_label_format = \
-        "< " + common.GraphText.get_text_precision_format(
-                  self._record_to_text_precision[self.group_by_record])
+        "Up to " + \
+            common.GraphText.get_text_precision_format(
+                self._record_to_text_precision[self.group_by_record])
     group_id_labels = [group_id_label_format.format(v = gid) for gid in self.group_ids]
-    plt.legend(handles = scatters, labels = group_id_labels, loc = 'upper right')
+    plt.legend(handles = scatters, labels = group_id_labels, loc = 'lower right',
+                title = "{} ({})".format(self.group_by_record.name, self.record_unit))
 
     if save:
-      save_filename = "{}.png".format(self.period.name)
+      save_filename = "{}_{}.png".format(self.period.name, self.group_by_record.name)
       self.show_or_save(show = show, save_filename = save_filename)
     else:
       self.show_or_save(show = show)

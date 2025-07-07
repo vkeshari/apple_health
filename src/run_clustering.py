@@ -1,4 +1,5 @@
 import numpy as np
+from scipy import stats
 from sklearn import decomposition
 
 import params as par
@@ -7,21 +8,22 @@ from util import csvutil, dataio, datautil, paramutil
 
 def get_groups_by_record(dataset, record_types, rescalers, r):
   assert r in record_types
+  percentile_intervals = [20, 40, 60, 80, 100]
 
   groups = []
   r_index = record_types.index(r)
   vals = dataset[ : , r_index]
   for v in vals:
-    for interval in [-2, -1, -0.5, -0.2, 0.2, 0.5, 1, 2]:
-      if v < interval:
-        groups.append(rescalers[r].backscale(interval))
+    percentile = stats.percentileofscore(vals, v)
+    for interval in percentile_intervals:
+      if percentile <= interval:
+        groups.append(rescalers[r].backscale(stats.scoreatpercentile(vals, interval)))
         break
     else:
       groups.append(10)
   return groups
 
-def do_clustering(data_dict, record_aggregation_types, record_units,
-                  record_types, group_by, period):
+def do_clustering(data_dict, record_aggregation_types, record_units, record_types, period):
   assert not record_aggregation_types.keys() ^ record_units.keys()
   assert not record_types - record_aggregation_types.keys()
 
@@ -52,9 +54,6 @@ def do_clustering(data_dict, record_aggregation_types, record_units,
     dataset.append(data_row)
   dataset = np.array(dataset)
 
-  groups = get_groups_by_record(dataset, record_types, rescalers, group_by)
-
-  print()
   print("Built datasets.")
 
   pca = decomposition.PCA(n_components = 2)
@@ -63,16 +62,20 @@ def do_clustering(data_dict, record_aggregation_types, record_units,
 
   print("Run Dimensionality Reduction.")
 
-  cluster = clustering.ClusteringGraph(xy_vals = dataset_new,
-                                        dates  = all_dates,
-                                        groups = groups,
-                                        record_types = record_types,
-                                        group_by_record = group_by,
-                                        period = period)
-  cluster.plot(show = False, save = True)
+  for r in record_types:
+    groups = get_groups_by_record(dataset, record_types, rescalers, r)
+
+    cluster = clustering.ClusteringGraph(xy_vals = dataset_new,
+                                          dates  = all_dates,
+                                          groups = groups,
+                                          record_types = record_types,
+                                          group_by_record = r,
+                                          record_unit = record_units[r],
+                                          period = period)
+    cluster.plot(show = False, save = True)
 
   print()
-  print("Done clustering for {}".format(period.name))
+  print("Clustering finished for {} data.".format(period.name))
 
 
 def run_clustering():
@@ -89,7 +92,6 @@ def run_clustering():
 
     do_clustering(data_dict, record_aggregation_types, record_units,
                   record_types = par.ClusteringParams.ACTIVITIES,
-                  group_by = par.ClusteringParams.GROUP_BY_ACTIVITY,
                   period = period)
 
 

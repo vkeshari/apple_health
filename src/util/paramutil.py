@@ -85,8 +85,8 @@ class Validator:
   def validate_run_clustering(cls):
     cls.validate_data_params()
 
+    assert par.AggregationPeriod.MONTHLY not in par.ClusteringParams.AGGREGATION_PERIODS
     assert par.AggregationPeriod.QUARTERLY not in par.ClusteringParams.AGGREGATION_PERIODS
-    assert par.ClusteringParams.GROUP_BY_ACTIVITY in par.ClusteringParams.ACTIVITIES
 
 
 class RecordProperties:
