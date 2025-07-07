@@ -100,12 +100,16 @@ class Rescaler:
 
   def __init__(self, data):
     self.average = np.average(list(data))
+
+    p5 = np.percentile(list(data), 5, method = 'nearest')
+    p95 = np.percentile(list(data), 95, method = 'nearest')
+    self.spread = max(abs(self.average - p5), abs(p95 - self.average))
   
   def rescale(self, val):
-    return (val - self.average) / self.average
+    return (val - self.average) / self.spread
   
   def rescale_all(self, vals):
     return [self.rescale(v) for v in vals]
   
   def backscale(self, val):
-    return (1 + val) * self.average
+    return self.average + val * self.spread

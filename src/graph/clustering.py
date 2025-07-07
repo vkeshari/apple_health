@@ -93,8 +93,9 @@ class ClusteringGraph:
             common.GraphText.get_text_precision_format(
                 self._record_to_text_precision[self.group_by_record])
     group_id_labels = [group_id_label_format.format(v = gid) for gid in self.group_ids]
-    plt.legend(handles = scatters, labels = group_id_labels, loc = 'lower right',
-                title = "{} ({})".format(self.group_by_record.name, self.record_unit))
+    plt.legend(handles = scatters, labels = group_id_labels, loc = 'lower left',
+                title = "{} ({})".format(self.group_by_record.name, self.record_unit),
+                alignment = 'left')
 
     if save:
       save_filename = "{}_{}.png".format(self.period.name, self.group_by_record.name)

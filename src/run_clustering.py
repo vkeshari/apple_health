@@ -6,6 +6,17 @@ import params as par
 from graph import clustering
 from util import csvutil, dataio, datautil, paramutil
 
+def remove_outliers(dataset, dates):
+  assert len(dataset) == len(dates)
+
+  reduced_data = []
+  reduced_dates = []
+  for i, date_vals in enumerate(dataset):
+    if all([-1 <= dv <= 1 for dv in date_vals]):
+      reduced_data.append(date_vals)
+      reduced_dates.append(dates[i])
+  return reduced_data, reduced_dates
+
 def get_groups_by_record(dataset, record_types, rescalers, r):
   assert r in record_types
   percentile_intervals = [20, 40, 60, 80, 100]
@@ -52,21 +63,21 @@ def do_clustering(data_dict, record_aggregation_types, record_units, record_type
       else:
         data_row.append(rescalers[r].rescale(all_r_by_date[r][d]))
     dataset.append(data_row)
-  dataset = np.array(dataset)
+  dataset, dates = remove_outliers(dataset, all_dates)
 
+  dataset = np.array(dataset)
   print("Built datasets.")
 
   pca = decomposition.PCA(n_components = 2)
   pca.fit(dataset)
   dataset_new = pca.transform(dataset)
-
   print("Run Dimensionality Reduction.")
 
   for r in record_types:
     groups = get_groups_by_record(dataset, record_types, rescalers, r)
 
     cluster = clustering.ClusteringGraph(xy_vals = dataset_new,
-                                          dates  = all_dates,
+                                          dates  = dates,
                                           groups = groups,
                                           record_types = record_types,
                                           group_by_record = r,
