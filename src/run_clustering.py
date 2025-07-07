@@ -40,6 +40,7 @@ def do_clustering(data_dict, record_aggregation_types, record_units, record_type
 
   print()
   record_types = list(record_types)
+
   all_r_by_date = {}
   for r in record_types:
     r_by_date = csvutil.CsvData.build_time_series_for_record(r, data_dict, record_units[r])
@@ -67,11 +68,24 @@ def do_clustering(data_dict, record_aggregation_types, record_units, record_type
 
   dataset = np.array(dataset)
   print("Built datasets.")
+  print("Record Types:")
+  for r in record_types:
+    print("\t{}".format(r.name))
+
+  pca0 = decomposition.PCA(n_components = len(record_types))
+  pca0.fit(dataset)
+
+  print()
+  print("Variance along Principal Components")
+  print(pca0.explained_variance_ratio_)
 
   pca = decomposition.PCA(n_components = 2)
   pca.fit(dataset)
   dataset_new = pca.transform(dataset)
-  print("Run Dimensionality Reduction.")
+  print()
+  print("Dimensionality reduction complete.")
+  print("Variance retained: {:.4f}".format(sum(pca.explained_variance_ratio_)))
+  print()
 
   for r in record_types:
     groups = get_groups_by_record(dataset, record_types, rescalers, r)
