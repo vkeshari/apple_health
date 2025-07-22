@@ -17,7 +17,7 @@ def bucket_randomly(r_values, num_buckets):
   return sorted(subset_averages)
 
 def build_bucket_tuning_graphs(data_dict, record_aggregation_types, record_units,
-                                bucket_range, num_runs):
+                                bucket_range, num_runs, zoom_graph):
   assert not record_aggregation_types.keys() ^ record_units.keys()
 
   for r in record_aggregation_types:
@@ -42,7 +42,8 @@ def build_bucket_tuning_graphs(data_dict, record_aggregation_types, record_units
     
     tuning_graph = tuning.TuningGraph(datasets, r,
                                       record_units[r], record_aggregation_types[r],
-                                      raw_values = list(r_by_date.values()), num_runs = num_runs)
+                                      raw_values = list(r_by_date.values()), num_runs = num_runs,
+                                      zoom_graph = zoom_graph)
     tuning_graph.plot(show = False, save = True)
 
 
@@ -60,7 +61,8 @@ def bucket_tuning():
                             par.BucketTuningParams.MAX_BUCKETS + 1,
                             par.BucketTuningParams.BUCKET_STEP))
   build_bucket_tuning_graphs(data_dict, record_aggregation_types, record_units,
-                              bucket_range, par.BucketTuningParams.NUM_RUNS)
+                              bucket_range, par.BucketTuningParams.NUM_RUNS,
+                              par.BucketTuningParams.ZOOM_GRAPH)
 
 if __name__ == '__main__':
   bucket_tuning()

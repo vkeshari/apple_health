@@ -134,6 +134,8 @@ class BucketTuningParams:
 
   NUM_RUNS = 20
 
+  ZOOM_GRAPH = True
+
 class CorrelationType(Enum):
   PEARSON = 0
   SPEARMAN = 1

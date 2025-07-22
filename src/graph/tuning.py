@@ -12,6 +12,8 @@ class TuningGraph:
   _subfolder = Path('tuning') / timeutil.Timestamp.get_timestamp()
   _dio = dataio.DataIO(par.DataParams)
 
+  _yzoom_fraction = 0.1
+
   _order_intervals = [[5, 95], [10, 90], [25, 75]]
   last_interval_start = 0
   last_interal_end = 100
@@ -34,7 +36,7 @@ class TuningGraph:
                         'WEEKLY': 7}
 
   def __init__(self, datasets, record_type, record_units, record_aggregation_type,
-                raw_values, num_runs):
+                raw_values, num_runs, zoom_graph):
     self.record_type = record_type
     self.record_units = record_units
     self.record_aggregation_type = record_aggregation_type
@@ -54,7 +56,13 @@ class TuningGraph:
                       for b in self.buckets}
     self.averages = {b: self.stats[b]['average'] for b in self.buckets}
 
-    self.ylim = round(np.average(list(self.averages.values())) * 2)
+    self.xlims = [0, self.max_buckets]
+    if zoom_graph:
+      self.ylims = [self.raw_average * (1.0 - self._yzoom_fraction),
+                    self.raw_average * (1.0 + self._yzoom_fraction)]
+    else:
+      self.ylims = [0, round(np.average(list(self.averages.values())) * 2)]
+    
     self.fig, self.ax = plt.subplots(figsize = self._resolution)
     self.init_plot()
   
@@ -70,15 +78,15 @@ class TuningGraph:
     self.ax.set_xlabel("No. of splits")
     self.ax.set_ylabel("Average {} per split".format(self.record_type.name))
 
-    self.ax.set_xlim(0, self.max_buckets)
-    xticks_major, xticks_minor = common.GraphTickSpacer.get_ticks(0, self.max_buckets)
+    self.ax.set_xlim(*self.xlims)
+    xticks_major, xticks_minor = common.GraphTickSpacer.get_ticks(*self.xlims)
     self.ax.set_xticks(xticks_major)
     self.ax.set_xticks(xticks_minor, minor = True)
     self.ax.grid(True, which = 'minor', axis = 'x', alpha = 0.3)
     self.ax.grid(True, which = 'major', axis = 'x', alpha = 0.5)
 
-    self.ax.set_ylim(0, self.ylim)
-    yticks_major, yticks_minor = common.GraphTickSpacer.get_ticks(0, self.ylim)
+    self.ax.set_ylim(*self.ylims)
+    yticks_major, yticks_minor = common.GraphTickSpacer.get_ticks(*self.ylims)
     self.ax.set_yticks(yticks_major)
     self.ax.set_yticks(yticks_minor, minor = True)
     self.ax.grid(True, which = 'minor', axis = 'y', alpha = 0.3)
@@ -86,14 +94,14 @@ class TuningGraph:
 
   def show_period_guide(self, gmtp, num_days = 1, label = ''):
     period_line = self.data_points / num_days
-    if period_line > self.max_buckets:
+    if period_line > self.xlims[1]:
       return
     
     plt.axvline(x = period_line, ymax = gmtp.get_y_current(),
                 linestyle = ':', linewidth = 2, color = 'gray', alpha = 0.8)
     gmtp.plot_annotation(
         s = label,
-        x_position = common.GraphPosition.get_relative_position(period_line, 0, self.max_buckets))
+        x_position = common.GraphPosition.get_relative_position(period_line, *self.xlims))
 
   def show_value_guide(self, val, alpha = 0.5):
     plt.axhline(y = val, linestyle = '-', linewidth = 2, color = 'gray', alpha = alpha)
@@ -128,8 +136,7 @@ class TuningGraph:
     
     y_positioner = common.YPositioner(y_start = 1.00 - 2 * self._text_spacing_factor,
                                       y_spacing = self._text_spacing_factor)
-    gmtp = common.GraphMultiTextPrinter(xlims = [0, self.max_buckets],
-                                        ylims = [0, self.ylim],
+    gmtp = common.GraphMultiTextPrinter(xlims = self.xlims, ylims = self.ylims,
                                         y_positioner = y_positioner,
                                         horizontalalignment = 'left',
                                         verticalalignment = 'bottom')
@@ -146,8 +153,7 @@ class TuningGraph:
 
     y_positioner = common.YPositioner(y_start = 1.00 - 2 * self._text_spacing_factor,
                                       y_spacing = self._text_spacing_factor)
-    gmtp = common.GraphMultiTextPrinter(xlims = [0, self.max_buckets],
-                                        ylims = [0, self.ylim],
+    gmtp = common.GraphMultiTextPrinter(xlims = self.xlims, ylims = self.ylims,
                                         y_positioner = y_positioner,
                                         x_position = 0.99,
                                         horizontalalignment = 'right',
