@@ -58,11 +58,11 @@ class DataParams:
   # These are used to decide what input CSV file(s) to read or write
   FILENAME_SUFFIX = ''
   START_DATE = date(2021, 1, 1)
-  END_DATE = date(2025, 3, 1)
+  END_DATE = date(2026, 1, 1)
   PARSE_TIMEZONE = ParseTimezone.DATA_TIMEZONE
 
 class ParserParams:
-  INPUT_FILENAME = '20250530.xml'
+  INPUT_FILENAME = '20260106.xml'
 
   # Configure summary in XmlDebugParams
   SHOW_SUMMARY = False
@@ -103,7 +103,7 @@ class AggregatorParams:
 
 class GraphParams:
   GRAPH_START_DATE = date(2021, 1, 1)
-  GRAPH_END_DATE = date(2025, 3, 1)
+  GRAPH_END_DATE = date(2026, 1, 1)
 
   AGGREGATION_PERIODS = [AggregationPeriod.DAILY,
                           AggregationPeriod.WEEKLY,
@@ -119,7 +119,7 @@ class BucketingType(Enum):
 
 class BucketedGraphParams:
   GRAPH_START_DATE = date(2021, 1, 1)
-  GRAPH_END_DATE = date(2025, 1, 1)
+  GRAPH_END_DATE = date(2026, 1, 1)
 
   # Does not support MONTHLY or QUARTERLY, due to small no. of data points
   AGGREGATION_PERIODS = [AggregationPeriod.DAILY,
@@ -158,7 +158,8 @@ class RecordComparisonParams:
   FIT_LINE = True
   
   # Ignore StepCount since it is highly correlated with DistanceWalkingRunning
-  IGNORE_ACTIVITIES = {Activity.StepCount}
+  # IGNORE_ACTIVITIES = {Activity.StepCount}
+  IGNORE_ACTIVITIES = {}
 
 class DistributionFitParams:
   # Does not support QUARTERLY, due to small no. of data points

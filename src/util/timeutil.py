@@ -37,7 +37,19 @@ class TimezoneHistory:
                       end_date = date(2025, 2, 12),
                       tz = _tz_china_standard),
       TimezonePeriod(start_date = date(2025, 2, 12),
-                      end_date = date(2025, 5, 31),
+                      end_date = date(2025, 8, 27),
+                      tz = _tz_india_standard),
+      TimezonePeriod(start_date = date(2025, 8, 27),
+                      end_date = date(2025, 9, 11),
+                      tz = _tz_china_standard),
+      TimezonePeriod(start_date = date(2025, 9, 11),
+                      end_date = date(2025, 11, 17),
+                      tz = _tz_india_standard),
+      TimezonePeriod(start_date = date(2025, 11, 17),
+                      end_date = date(2026, 1, 29),
+                      tz = _tz_china_standard),
+      TimezonePeriod(start_date = date(2026, 1, 29),
+                      end_date = date(2026, 7, 1),
                       tz = _tz_india_standard)]
   _first_date = _tz_history[0].start_date
 
