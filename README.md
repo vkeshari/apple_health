@@ -1,8 +1,8 @@
-# apple_health
+# Apple Health Insights Library
 
 > [!IMPORTANT]
 > You may use the code in this repository for your own analysis of apple health data,
-> but **you must attribute references to this or any derivative work to the original author**.
+> but **please attribute references to this or any derivative work to the original author**.
 
 The Apple Health library can processes, aggregate, compare and visualize fitness data
 exported by Apple Health.
