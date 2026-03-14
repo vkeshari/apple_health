@@ -7,6 +7,13 @@
 The Apple Health library can processes, aggregate, compare and visualize fitness data
 exported by Apple Health.
 
+> [!TIP]
+> Head over to the [Wiki](https://github.com/vkeshari/apple_health/wiki) for detailed reports on:
+> * **Insights into Health**, and 
+> * **A Data-Based Approach to Sustained Daily Fitness**.
+> > _Last Updated: March 2026_
+
+
 # Code Structure
 `params.py`: All config lives here. Treat this as command-line params.
 
