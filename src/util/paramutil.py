@@ -140,7 +140,8 @@ class RecordCorrelations:
   
   @classmethod
   def is_ignored_activity(cls, r):
-    return r in par.RecordComparisonParams.IGNORE_ACTIVITIES
+    return r not in par.RecordComparisonParams.LIMIT_TO_ACTIVITIES \
+              or r in par.RecordComparisonParams.IGNORE_ACTIVITIES
 
 
 class RecordHistogramProperties:

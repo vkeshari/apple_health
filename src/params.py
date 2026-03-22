@@ -146,8 +146,8 @@ class RecordComparisonParams:
   AGGREGATION_PERIODS = [AggregationPeriod.DAILY,
                           AggregationPeriod.WEEKLY]
   
-  MAX_PERIOD_DELTAS = {AggregationPeriod.DAILY: 14,
-                        AggregationPeriod.WEEKLY: 6}
+  MAX_PERIOD_DELTAS = {AggregationPeriod.DAILY: 1,
+                        AggregationPeriod.WEEKLY: 1}
   
   MIN_DATA_POINTS_FOR_CORRELATION = 25
   MIN_ACCEPTABLE_CORRELATION_FOR_ALL_MEASURES = 0.25
@@ -156,10 +156,16 @@ class RecordComparisonParams:
                                     CorrelationType.KENDALL: 0.5}
   
   FIT_LINE = True
+
+  # Only find correlations between these activities.
+  LIMIT_TO_ACTIVITIES = {Activity.ActiveEnergyBurned,
+                          Activity.AppleExerciseTime,
+                          Activity.AppleStandTime,
+                          Activity.DistanceWalkingRunning,
+                          Activity.StepCount}
   
-  # Ignore StepCount since it is highly correlated with DistanceWalkingRunning
-  # IGNORE_ACTIVITIES = {Activity.StepCount}
-  IGNORE_ACTIVITIES = {}
+  # Ignore these activities from the LIMIT_TO_ACTIVITIES list.
+  IGNORE_ACTIVITIES = {Activity.StepCount} # highly correlated with DistanceWalkingRunning
 
 class DistributionFitParams:
   # Does not support QUARTERLY, due to small no. of data points
@@ -177,7 +183,7 @@ class ClusteringParams:
 
   ACTIVITIES = {Activity.ActiveEnergyBurned,
                 Activity.AppleStandTime,
-                Activity.DistanceWalkingRunning}
+                Activity.StepCount}
 
 
 # Record and Graph Configs
