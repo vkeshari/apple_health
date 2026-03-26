@@ -8,8 +8,7 @@ import math
 
 DAYS_IN_WEEK = 7
 
-def build_moving_averages(data_dict, record_aggregation_types, record_units,
-                          activities, min_weeks, max_weeks, consistent_periods, graph_sets):
+def build_moving_averages(data_dict, activities, min_weeks, max_weeks, consistent_periods):
   
   all_dates = list(data_dict.keys())
   activity_to_vals = {a: [] for a in activities if all(a in data_dict[d] for d in data_dict)}
@@ -20,32 +19,39 @@ def build_moving_averages(data_dict, record_aggregation_types, record_units,
   for a in activity_to_vals:
     assert len(activity_to_vals[a]) == len(all_dates)
 
+  moving_averages = {a: {} for a in activity_to_vals}
+
   for a in activity_to_vals:
     overall_avg = np.average(activity_to_vals[a])
-    print(str(a) + '\t' + "{:.2f}".format(overall_avg))
+    print(str(a) + '\tAVG:\t' + "{:.2f}".format(overall_avg))
 
-    moving_averages = {n: {} for n in range(min_weeks, max_weeks + 1)}
+    moving_averages[a] = {n: {} for n in range(min_weeks, max_weeks + 1)}
     for i in range(len(activity_to_vals[a]) + 1):
       if i < min_weeks * DAYS_IN_WEEK or consistent_periods and i < max_weeks * DAYS_IN_WEEK:
         continue
       
-      for n in moving_averages:
+      for n in moving_averages[a]:
         window_days = n * DAYS_IN_WEEK
         if i < window_days:
           continue
 
-        moving_averages[n][all_dates[i - 1]] = \
+        moving_averages[a][n][all_dates[i - 1]] = \
                 np.sum(activity_to_vals[a][i - window_days : i]) / window_days
     
-    for n in moving_averages:
-      print (str(n) + '\t' + str(len(moving_averages[n])) + '\t' + str(min(moving_averages[n])) + '\t' + str(max(moving_averages[n])))
+    return moving_averages, overall_avg
+  
+
+def show_moving_averages(moving_averages, overall_avg, min_weeks, max_weeks, graph_sets):
+  
+  for a in moving_averages:
+    activity_ma = moving_averages[a]
 
     rms_errors = {}
-    for n in moving_averages:
+    for n in activity_ma:
       sq_sum = 0.0
-      for d in moving_averages[n]:
-        sq_sum += math.pow(moving_averages[n][d] - overall_avg, 2)
-      rms_errors[n] = math.sqrt(sq_sum / len(moving_averages[n]))
+      for d in activity_ma[n]:
+        sq_sum += math.pow(activity_ma[n][d] - overall_avg, 2)
+      rms_errors[n] = math.sqrt(sq_sum / len(activity_ma[n]))
 
     xs, ys = zip(*rms_errors.items())
     plt.plot(xs,  ys)
@@ -56,11 +62,11 @@ def build_moving_averages(data_dict, record_aggregation_types, record_units,
     for s in pair_rms_errors:
       for l in pair_rms_errors[s]:
         sq_sum = 0.0
-        for d in moving_averages[s]:
-          if d not in moving_averages[l]:
+        for d in activity_ma[s]:
+          if d not in activity_ma[l]:
             continue
-          sq_sum += math.pow(moving_averages[s][d] - moving_averages[l][d], 2)
-        pair_rms_errors[s][l] = math.sqrt(sq_sum / len(moving_averages[l]))
+          sq_sum += math.pow(activity_ma[s][d] - activity_ma[l][d], 2)
+        pair_rms_errors[s][l] = math.sqrt(sq_sum / len(activity_ma[l]))
     
     max_val = max([max(pair_rms_errors[s].values()) for s in pair_rms_errors])
     
@@ -77,10 +83,22 @@ def build_moving_averages(data_dict, record_aggregation_types, record_units,
   
     for gs in graph_sets:
       for p in gs:
-        xs, ys = zip(*moving_averages[p].items())
+        xs, ys = zip(*activity_ma[p].items())
         plt.plot(xs, ys, linewidth = 2, alpha = 0.5)
       
       plt.show()
+
+
+def process_moving_averages(data_dict, record_aggregation_types, record_units,
+                            activities = par.MovingAverageParams.ACTIVITIES,
+                            min_weeks = par.MovingAverageParams.MIN_WEEKS,
+                            max_weeks = par.MovingAverageParams.MAX_WEEKS,
+                            consistent_periods = par.MovingAverageParams.CONSISTENT_PERIODS,
+                            graph_sets = par.MovingAverageParams.GRAPH_SETS):
+  
+  moving_averages, overall_avg = build_moving_averages(data_dict, activities, min_weeks, max_weeks,
+                                                        consistent_periods)
+  show_moving_averages(moving_averages, overall_avg, min_weeks, max_weeks, graph_sets)
 
 
 def moving_average():
@@ -94,12 +112,12 @@ def moving_average():
   data_csv = dio.get_csv_file(period = par.AggregationPeriod.DAILY)
   data_dict = csvutil.CsvIO.read_data_csv(data_csv)
 
-  build_moving_averages(data_dict, record_aggregation_types, record_units,
-                        activities = par.MovingAverageParams.ACTIVITIES,
-                        min_weeks = par.MovingAverageParams.MIN_WEEKS,
-                        max_weeks = par.MovingAverageParams.MAX_WEEKS,
-                        consistent_periods = par.MovingAverageParams.CONSISTENT_PERIODS,
-                        graph_sets = par.MovingAverageParams.GRAPH_SETS)
+  process_moving_averages(data_dict, record_aggregation_types, record_units,
+                          activities = par.MovingAverageParams.ACTIVITIES,
+                          min_weeks = par.MovingAverageParams.MIN_WEEKS,
+                          max_weeks = par.MovingAverageParams.MAX_WEEKS,
+                          consistent_periods = par.MovingAverageParams.CONSISTENT_PERIODS,
+                          graph_sets = par.MovingAverageParams.GRAPH_SETS)
 
 
 if __name__ == '__main__':
