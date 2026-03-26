@@ -87,6 +87,20 @@ class Validator:
 
     assert par.AggregationPeriod.MONTHLY not in par.ClusteringParams.AGGREGATION_PERIODS
     assert par.AggregationPeriod.QUARTERLY not in par.ClusteringParams.AGGREGATION_PERIODS
+  
+  @classmethod
+  def validate_moving_average(cls):
+    cls.validate_data_params()
+
+    assert 0 < par.MovingAverageParams.MIN_WEEKS < par.MovingAverageParams.MAX_WEEKS
+    assert 0 < len(par.MovingAverageParams.ACTIVITIES)
+
+    for i, gs in enumerate(par.MovingAverageParams.GRAPH_SETS):
+      par.MovingAverageParams.GRAPH_SETS[i] = list(sorted(set(gs)))
+      assert par.MovingAverageParams.MIN_WEEKS <= \
+                  gs[0] <= gs[-1] <= \
+                  par.MovingAverageParams.MAX_WEEKS
+    print (par.MovingAverageParams.GRAPH_SETS)
 
 
 class RecordProperties:

@@ -167,6 +167,19 @@ class RecordComparisonParams:
   # Ignore these activities from the LIMIT_TO_ACTIVITIES list.
   IGNORE_ACTIVITIES = {Activity.StepCount} # highly correlated with DistanceWalkingRunning
 
+class MovingAverageParams:
+  MIN_WEEKS = 1
+  MAX_WEEKS = 52
+
+  # If this is true, all periods start only when the MAX_WEEKS moving average is available.
+  CONSISTENT_PERIODS = False
+
+  ACTIVITIES = {Activity.ActiveEnergyBurned}
+
+  GRAPH_SETS = [[2, 6, 13],
+                [6, 13, 26],
+                [13, 26, 52]]
+
 class DistributionFitParams:
   # Does not support QUARTERLY, due to small no. of data points
   AGGREGATION_PERIODS = [AggregationPeriod.DAILY]
