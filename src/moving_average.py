@@ -20,6 +20,7 @@ def build_moving_averages(data_dict, activities, min_weeks, max_weeks, consisten
     assert len(activity_to_vals[a]) == len(all_dates)
 
   moving_averages = {a: {} for a in activity_to_vals}
+  rolling_averages = {a: {} for a in activity_to_vals}
 
   for a in activity_to_vals:
     overall_avg = np.average(activity_to_vals[a])
@@ -27,8 +28,13 @@ def build_moving_averages(data_dict, activities, min_weeks, max_weeks, consisten
 
     moving_averages[a] = {n: {} for n in range(min_weeks, max_weeks + 1)}
     for i in range(len(activity_to_vals[a]) + 1):
+      
       if i < min_weeks * DAYS_IN_WEEK or consistent_periods and i < max_weeks * DAYS_IN_WEEK:
         continue
+
+      if i > 0:
+        rolling_averages[a][all_dates[i - 1]] = \
+                  np.sum(activity_to_vals[a][ : i]) / i
       
       for n in moving_averages[a]:
         window_days = n * DAYS_IN_WEEK
@@ -38,10 +44,11 @@ def build_moving_averages(data_dict, activities, min_weeks, max_weeks, consisten
         moving_averages[a][n][all_dates[i - 1]] = \
                 np.sum(activity_to_vals[a][i - window_days : i]) / window_days
     
-    return moving_averages, overall_avg
+    return moving_averages, rolling_averages, overall_avg
   
 
-def show_moving_averages(moving_averages, overall_avg, min_weeks, max_weeks, graph_sets):
+def show_moving_averages(moving_averages, rolling_averages, overall_avg,
+                          min_weeks, max_weeks, use_rolling_avg, graph_sets):
   
   for a in moving_averages:
     activity_ma = moving_averages[a]
@@ -50,7 +57,10 @@ def show_moving_averages(moving_averages, overall_avg, min_weeks, max_weeks, gra
     for n in activity_ma:
       sq_sum = 0.0
       for d in activity_ma[n]:
-        sq_sum += math.pow(activity_ma[n][d] - overall_avg, 2)
+        if use_rolling_avg:
+          sq_sum += math.pow(activity_ma[n][d] - rolling_averages[a][d], 2)
+        else:
+          sq_sum += math.pow(activity_ma[n][d] - overall_avg, 2)
       rms_errors[n] = math.sqrt(sq_sum / len(activity_ma[n]))
 
     xs, ys = zip(*rms_errors.items())
@@ -82,23 +92,23 @@ def show_moving_averages(moving_averages, overall_avg, min_weeks, max_weeks, gra
     plt.show()
   
     for gs in graph_sets:
+      xs, ys = zip(*rolling_averages[a].items())
+      plt.plot(xs, ys, linewidth = 2, alpha = 0.5)
+
       for p in gs:
         xs, ys = zip(*activity_ma[p].items())
-        plt.plot(xs, ys, linewidth = 2, alpha = 0.5)
+        plt.plot(xs, ys, linewidth = 3, alpha = 0.3)
       
       plt.show()
 
 
-def process_moving_averages(data_dict, record_aggregation_types, record_units,
-                            activities = par.MovingAverageParams.ACTIVITIES,
-                            min_weeks = par.MovingAverageParams.MIN_WEEKS,
-                            max_weeks = par.MovingAverageParams.MAX_WEEKS,
-                            consistent_periods = par.MovingAverageParams.CONSISTENT_PERIODS,
-                            graph_sets = par.MovingAverageParams.GRAPH_SETS):
+def process_moving_averages(data_dict, activities, min_weeks, max_weeks,
+                            consistent_periods, use_rolling_avg, graph_sets):
   
-  moving_averages, overall_avg = build_moving_averages(data_dict, activities, min_weeks, max_weeks,
-                                                        consistent_periods)
-  show_moving_averages(moving_averages, overall_avg, min_weeks, max_weeks, graph_sets)
+  moving_averages, rolling_averages, overall_avg = \
+        build_moving_averages(data_dict, activities, min_weeks, max_weeks, consistent_periods)
+  show_moving_averages(moving_averages, rolling_averages, overall_avg,
+                        min_weeks, max_weeks, use_rolling_avg, graph_sets)
 
 
 def moving_average():
@@ -112,11 +122,12 @@ def moving_average():
   data_csv = dio.get_csv_file(period = par.AggregationPeriod.DAILY)
   data_dict = csvutil.CsvIO.read_data_csv(data_csv)
 
-  process_moving_averages(data_dict, record_aggregation_types, record_units,
+  process_moving_averages(data_dict,
                           activities = par.MovingAverageParams.ACTIVITIES,
                           min_weeks = par.MovingAverageParams.MIN_WEEKS,
                           max_weeks = par.MovingAverageParams.MAX_WEEKS,
                           consistent_periods = par.MovingAverageParams.CONSISTENT_PERIODS,
+                          use_rolling_avg = par.MovingAverageParams.USE_ROLLING_AVG_FOR_ERRORS,
                           graph_sets = par.MovingAverageParams.GRAPH_SETS)
 
 

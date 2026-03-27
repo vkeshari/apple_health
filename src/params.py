@@ -172,12 +172,12 @@ class MovingAverageParams:
   MAX_WEEKS = 52
 
   # If this is true, all periods start only when the MAX_WEEKS moving average is available.
-  CONSISTENT_PERIODS = False
+  CONSISTENT_PERIODS = True
+  USE_ROLLING_AVG_FOR_ERRORS = True
 
   ACTIVITIES = {Activity.ActiveEnergyBurned}
 
-  GRAPH_SETS = [[2, 6, 13],
-                [6, 13, 26],
+  GRAPH_SETS = [[4, 6, 13],
                 [13, 26, 52]]
 
 class DistributionFitParams:
