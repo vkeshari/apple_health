@@ -18,9 +18,7 @@ class TuningGraph:
   last_interval_start = 0
   last_interal_end = 100
   for oi in _order_intervals:
-    assert oi[0] > last_interval_start
-    assert oi[1] < last_interal_end
-    assert oi[1] > oi[0]
+    assert last_interval_start < oi[0] < oi[1] < last_interal_end
     assert oi[0] == 100 - oi[1]
     last_interval_start = oi[0]
     last_interal_end = oi[1]

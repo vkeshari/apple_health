@@ -100,7 +100,6 @@ class Validator:
       assert par.MovingAverageParams.MIN_WEEKS <= \
                   gs[0] <= gs[-1] <= \
                   par.MovingAverageParams.MAX_WEEKS
-    print (par.MovingAverageParams.GRAPH_SETS)
 
 
 class RecordProperties:

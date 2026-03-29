@@ -173,11 +173,15 @@ class MovingAverageParams:
 
   # If this is true, all periods start only when the MAX_WEEKS moving average is available.
   CONSISTENT_PERIODS = True
-  USE_ROLLING_AVG_FOR_ERRORS = True
+  USE_ROLLING_AVG_FOR_ERRORS = False
 
-  ACTIVITIES = {Activity.ActiveEnergyBurned}
+  ACTIVITIES = {Activity.ActiveEnergyBurned,
+                Activity.AppleExerciseTime,
+                Activity.AppleStandTime,
+                Activity.DistanceWalkingRunning,
+                Activity.StepCount}
 
-  GRAPH_SETS = [[4, 6, 13],
+  GRAPH_SETS = [[6, 8, 13],
                 [13, 26, 52]]
 
 class DistributionFitParams:
