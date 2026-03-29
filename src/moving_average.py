@@ -1,8 +1,7 @@
 import params as par
-from graph import histogram, linegraph, movingavg
-from util import csvutil, dataio, paramutil, timeutil
+from graph import movingavg, rmserror
+from util import csvutil, dataio, paramutil
 
-from matplotlib import pyplot as plt
 import numpy as np
 import math
 
@@ -67,18 +66,18 @@ def show_moving_averages(record_aggregation_types, record_units,
         else:
           sq_sum += math.pow(activity_ma[n][d] - activity_oa, 2)
       rms_errors[n] = math.sqrt(sq_sum / len(activity_ma[n]))
-
-    # xs, ys = zip(*rms_errors.items())
-    # plt.plot(xs,  ys)
-    # plt.show()
+    
+    rms_graph = rmserror.RMSErrorGraph(activity_oa, rms_errors, use_rolling_avg,
+                                        a, record_units[a], record_aggregation_types[a])
+    rms_graph.plot(show = False, save = True)
   
     for gs in graph_sets:
       relevant_moving_avgs = {n: avgs for n, avgs in activity_ma.items() if n in gs}
       relevant_rms_errors = {n: rms for n, rms in rms_errors.items() if n in gs}
-      graph = movingavg.MovingAvgGraph(relevant_moving_avgs, activity_ra, activity_oa,
-                                        relevant_rms_errors, use_rolling_avg,
-                                        a, record_units[a], record_aggregation_types[a])
-      graph.plot(show = False, save = True)
+      mavg_graph = movingavg.MovingAvgGraph(relevant_moving_avgs, activity_ra, activity_oa,
+                                            relevant_rms_errors, use_rolling_avg,
+                                            a, record_units[a], record_aggregation_types[a])
+      mavg_graph.plot(show = False, save = True)
 
 
 def process_moving_averages(data_dict, record_aggregation_types, record_units,

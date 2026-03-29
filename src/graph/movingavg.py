@@ -1,10 +1,9 @@
-import numpy as np
 from matplotlib import pyplot as plt
 from pathlib import Path
 
 import params as par
 from . import common
-from util import dataio, datautil, timeutil
+from util import dataio, timeutil
 
 class MovingAvgGraph:
   _resolution = tuple([10.8, 7.2])
@@ -34,18 +33,18 @@ class MovingAvgGraph:
     self.end_date = self._dio.data_params.START_DATE
     self.min_val = self.overall_avg * 2
     self.max_val = 0
-    for n in moving_avgs:
-      min_date = min(moving_avgs[n].keys())
+    for n in self.moving_avgs:
+      min_date = min(self.moving_avgs[n].keys())
       if min_date < self.start_date:
         self.start_date = min_date
-      max_date = max(moving_avgs[n].keys())
+      max_date = max(self.moving_avgs[n].keys())
       if max_date > self.end_date:
         self.end_date = max_date
 
-      min_val = min(moving_avgs[n].values())
+      min_val = min(self.moving_avgs[n].values())
       if min_val < self.min_val:
         self.min_val = min_val
-      max_val = max(moving_avgs[n].values())
+      max_val = max(self.moving_avgs[n].values())
       if max_val > self.max_val:
         self.max_val = max_val
 
@@ -64,7 +63,7 @@ class MovingAvgGraph:
                                                   period = par.AggregationPeriod.DAILY)
     title_text = title_text + '\n' + "Moving Averages by Window Size in weeks"
     self.ax.set_title(title_text)
-    self.ax.set_xlabel("Window Size (weeks)")
+    self.ax.set_xlabel("Date")
     self.ax.set_ylabel("{}: Moving Averages ({})".format(self.record_type.name,
                                                           self.record_units))
 
