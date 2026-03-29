@@ -173,7 +173,7 @@ class MovingAverageParams:
 
   # If this is true, all periods start only when the MAX_WEEKS moving average is available.
   CONSISTENT_PERIODS = True
-  USE_ROLLING_AVG_FOR_ERRORS = False
+  USE_ROLLING_AVG_FOR_ERRORS = True
 
   ACTIVITIES = {Activity.ActiveEnergyBurned,
                 Activity.AppleExerciseTime,
