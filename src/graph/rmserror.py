@@ -91,7 +91,7 @@ class RMSErrorGraph:
 
     xs, ys = zip(*self.rms_errors.items())
     rmserror_plot = plt.plot(xs, ys, linewidth = 3, alpha = 0.7, antialiased = True,
-                              label = "RMS Error of Rolling Averages")
+                              label = "RMS Error of Moving Averages")
     graphs.append(rmserror_plot[0])
     
     self.show_value_guide(self.overall_avg * 0.01, alpha = 0.5)
